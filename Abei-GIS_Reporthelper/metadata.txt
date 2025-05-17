@@ -1,0 +1,15 @@
+[general]
+name=Abei-GIS_Reporthelper
+qgisMinimumVersion=3.16
+description= Plugin to export Vmap analysis restrictions in KML & to generate Word report of the analysis.
+version=1.0
+author=Quentin Rouquette
+email=quentinrouquette@abeienergy.com
+icon=icons/icon.png
+
+[about]
+homepage=https://github.com/quentin0x00/ABEI-GIS_ReportHelper_qgis-plugin
+repository=https://github.com/quentin0x00/ABEI-GIS_ReportHelper_qgis-plugin
+
+[requirements]
+pip_requirements=python-docx
