@@ -9,8 +9,17 @@
   Exports all individual and theme-grouped restrictions, along with feasible areas and the global area of the analysis.
 
 <p align="center">
-<br>
-  <img src="plugin-view.jpg" alt="plugin" />
+  <table>
+    <tr>
+      <td>
+        <img src="plugin-view.jpg" alt="Plugin view" width="300px"><br>
+        <img src="plugin-view_kml.jpg" alt="KML view" width="300px">
+      </td>
+      <td style="vertical-align: top; padding-left: 20px;">
+        <img src="plugin-view_word.jpg" alt="Word report" height="400px">
+      </td>
+    </tr>
+  </table>
 </p>
 
 
