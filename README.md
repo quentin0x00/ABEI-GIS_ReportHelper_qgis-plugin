@@ -24,17 +24,36 @@ The config file has been hidden from the project.
 - **Email:** [quentinrouquette@abeienergy.com](mailto:quentinrouquette@abeienergy.com)
 
 
-
 ## Installation
 
-This plugin is for internal use only and is not available via the QGIS Plugin Repository. It can only be installed as a ZIP plugin, which we provide internaly.
+This plugin is for internal use only and is not available via the QGIS Plugin Repository. It can only be installed as a ZIP plugin, which we provide internally.
 
-To install, follow these steps:
 
-    Download the provided ZIP file containing the plugin.
+### Prerequisites
 
-    In QGIS, go to Plugins > Manage and Install Plugins.
+Before installing the plugin, you need to ensure that the `python-docx` library is installed. This library is required for the plugin to function properly.
 
-    Click on the Install from ZIP button.
+- If you are installing the plugin with the provided ZIP file, the `python-docx` library has already been included. However, if you need to install it manually, use the following command:
 
-    Select the downloaded ZIP file and install the plugin.
+    ```bash
+    pip install python-docx --target=./lib
+    ```
+
+    This will install the library in the `./lib` directory to make it easier for users to install.
+
+- Alternatively, if users dont mind running a command line, use this:
+
+    ```bash
+    "C:\Program Files\QGIS 3.42.0\apps\Python312\python.exe" -m pip install python-docx
+    ```
+
+### Plugin Installation
+
+To install the plugin, follow these steps:
+
+1. Download the provided ZIP file containing the plugin.
+2. In QGIS, go to `Plugins` > `Manage and Install Plugins`.
+3. Click on the `Install from ZIP` button.
+4. Select the downloaded ZIP file and install the plugin.
+
+Once installed, the plugin will be available for use in QGIS.
