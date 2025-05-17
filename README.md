@@ -12,8 +12,8 @@
   <table>
     <tr>
       <td>
-        <img src="plugin-view.jpg" alt="Plugin view" width="320px"><br>
-        <img src="plugin-view_kml.jpg" alt="KML view" width="320px">
+        <img src="plugin-view.jpg" alt="Plugin view" width="300px"><br>
+        <img src="plugin-view_kml.jpg" alt="KML view" width="300px">
       </td>
       <td style="vertical-align: top; padding-left: 20px;">
         <img src="plugin-view_word.jpg" alt="Word report" height="400px">
