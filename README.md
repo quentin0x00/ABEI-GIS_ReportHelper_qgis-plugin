@@ -8,7 +8,10 @@
 - **Export to KML**  
   Exports all individual and theme-grouped restrictions, along with feasible areas and the global area of the analysis.
 
-
+<p align="center">
+<br>
+  <img src="plugin-view.jpg" alt="plugin" />
+</p>
 
 
 **Note:**  
