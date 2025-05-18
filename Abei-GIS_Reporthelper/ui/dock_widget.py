@@ -1,6 +1,7 @@
 from ..imports import *
 from ..config import Config
 from ..core.plugin_controller import PluginController
+from .stylesheet import STYLESHEET
 
 class FCReportDock(QDockWidget):
     """
@@ -24,7 +25,7 @@ class FCReportDock(QDockWidget):
         self.kml_btn.clicked.connect(self.controller.export_to_kml)
         self.cancel_btn.clicked.connect(self.reset_interface)
         self.ok_btn.clicked.connect(self.controller.generate_report)
-        self.fc_type_combo.currentIndexChanged.connect(self.activate_selected_layer)
+        self.technology_combo.currentIndexChanged.connect(self.activate_selected_layer)
         
     def reset_interface(self):
         """
@@ -33,7 +34,7 @@ class FCReportDock(QDockWidget):
         - Désactive les boutons
         - Réinitialise les outils de sélection
         """
-        self.fc_type_combo.setCurrentIndex(0)
+        self.technology_combo.setCurrentIndex(0)
         
         self.selected_object_label.clear()
         self.selected_object_label.setPlaceholderText("No analysis selected")
@@ -45,7 +46,7 @@ class FCReportDock(QDockWidget):
             iface.mapCanvas().unsetMapTool(self.selection_tool)
             self.selection_tool = None
         
-        self.selected_feature = None
+        self.selected_analysis = None
         self.update_status("Ready - Select a technology and click on an analysis")
 
     def _init_ui(self):
@@ -56,76 +57,12 @@ class FCReportDock(QDockWidget):
         - Champs
         - En-tête
         """
-        self.setObjectName("FCReportDockWidget")
+        self.setObjectName("VmapDockWidget")
         self.setFeatures(QDockWidget.DockWidgetClosable |
                         QDockWidget.DockWidgetMovable |
                         QDockWidget.DockWidgetFloatable)
 
-        self.setStyleSheet("""
-            QDockWidget {
-                background: #f8f9fa;
-                border: 1px solid #dee2e6;
-                titlebar-close-icon: url(:/icons/close.svg);
-                titlebar-normal-icon: url(:/icons/dock.svg);
-                font-family: Segoe UI, Arial;
-            }
-            QDockWidget::title {
-                color: black;
-                padding: 4px;
-                text-align: center;
-                font-weight: bold;
-            }
-            QWidget {
-                background: white;
-            }
-            QLabel {
-                color: #495057;
-                font-size: 12px;
-                margin-top: 8px;
-            }
-            QComboBox {
-                background: white;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                padding: 3px;
-                min-height: 24px;
-                color: #212529;
-            }
-            QComboBox:hover {
-                border-color: #adb5bd;
-            }
-            QComboBox:on {  /* When the combo box is open */
-                color: #212529;
-            }
-            QComboBox QAbstractItemView {
-                background: white;
-                color: #212529;
-                selection-background-color: #0d6efd;
-                selection-color: white;
-                outline: 0;  /* Remove focus border */
-            }
-            QLineEdit {
-                background: #f8f9fa;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                padding: 5px;
-                color: #212529;
-            }
-            QPushButton {
-                background: #0d6efd;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 6px 12px;
-                font-weight: 500;
-            }
-            QPushButton:hover {
-                background: #0b5ed7;
-            }
-            QPushButton:disabled {
-                background: #6c757d;
-            }
-        """)
+        self.setStyleSheet(STYLESHEET)
 
         self.main_widget = QWidget()
         self.setWidget(self.main_widget)
@@ -145,7 +82,7 @@ class FCReportDock(QDockWidget):
             logo.setPixmap(pixmap)
             header_layout.addWidget(logo)
 
-        title = QLabel("Report Helper - First Check")
+        title = QLabel("Report Helper")
         title.setStyleSheet("font-weight: bold; font-size: 14px; color: #212529;")
         header_layout.addWidget(title)
         header_layout.addStretch()
@@ -159,10 +96,24 @@ class FCReportDock(QDockWidget):
         self.layout.addWidget(separator)
 
         # Controls
+        # Mode selector
+        mode_layout = QHBoxLayout()
+        self.radio_fc = QRadioButton("First Check")
+        self.radio_dc = QRadioButton("Double Check")
+        self.radio_fc.setChecked(True)  # FC par défaut
+        # mode_layout.addWidget(QLabel("Select mode:"))
+        mode_layout.addWidget(self.radio_fc)
+        mode_layout.addWidget(self.radio_dc)
+        self.layout.addLayout(mode_layout)
+
+        self.radio_fc.toggled.connect(lambda: self.switch_mode('FC'))
+        self.radio_dc.toggled.connect(lambda: self.switch_mode('DC'))
+
+        
         self.layout.addWidget(QLabel("1. Select the technology:"))
-        self.fc_type_combo = QComboBox()
-        self.fc_type_combo.setToolTip("Select the technology of the analysis")
-        self.layout.addWidget(self.fc_type_combo)
+        self.technology_combo = QComboBox()
+        self.technology_combo.setToolTip("Select the technology of the analysis")
+        self.layout.addWidget(self.technology_combo)
 
         self.layout.addWidget(QLabel("2. Click on the map to select an analysis"))
         self.selected_object_label = QLineEdit()
@@ -198,8 +149,8 @@ class FCReportDock(QDockWidget):
         self.layout.addStretch()
 
         self.selection_tool = None
-        self.selected_feature = None
-        self.init_fc_types()
+        self.selected_analysis = None
+        self.init_technologys()
 
     def update_status(self, message, error=False):
         """
@@ -211,33 +162,33 @@ class FCReportDock(QDockWidget):
         color = "#dc3545" if error else "#28a745"
         self.status_label.setStyleSheet(f"color: {color}; font-size: 11px;")
         self.status_label.setText(message)
-
-    def init_fc_types(self):
+        
+    def switch_mode(self, mode):
         """
-        Charge les types de technologies FC depuis la configuration,
+        Bascule entre les modes FC et DC et recharge les technologies disponibles.
+        """
+        Config.set_mode(mode)
+        self.init_technologys()
+        self.reset_interface()
+
+    def init_technologys(self):
+        """
+        Charge les types de technologies (FC/DC) depuis la configuration,
         et les affiche dans le combo avec un choix par défaut.
         """
-        self.fc_type_combo.clear()
-        self.fc_type_combo.addItem("None", None)
-        
-        
-        
-        for fc_type, config in Config.FC_CONFIG.items():
-            self.fc_type_combo.addItem(config['name'], fc_type)
-        self.fc_type_combo.setCurrentIndex(0)
+        self.technology_combo.clear()
+        self.technology_combo.addItem("None", None)
+
+        config_dict = Config.FC_CONFIG if Config.CURRENT_MODE == 'FC' else Config.DC_CONFIG
+        for technology, config in config_dict.items():
+            self.technology_combo.addItem(config['technology'], technology)
+
+        self.technology_combo.setCurrentIndex(0)
         self.update_status("Ready - Select a technology and click on an analysis")
 
 
     def activate_selected_layer(self):
-        """
-        Active la couche correspondant au type FC sélectionné.
-
-        - Vérifie la sélection
-        - Active la couche avec le motif défini
-        - Active l'outil de sélection
-        """
-        current_index = self.fc_type_combo.currentIndex()
-        
+        current_index = self.technology_combo.currentIndex()
         if current_index == 0:
             self.reset_interface()
             return
@@ -245,66 +196,74 @@ class FCReportDock(QDockWidget):
         if self.selection_tool:
             iface.mapCanvas().unsetMapTool(self.selection_tool)
 
-        fc_type = self.fc_type_combo.currentData()
-        if fc_type is None:
+        technology = self.technology_combo.currentData()
+        if not technology:
             return
 
-        pattern = Config.FC_CONFIG[fc_type]['area_layer_pattern']
+        config = Config.get_config(technology)
+        pattern = config['global_area_layer']
+        
+        QgsMessageLog.logMessage(f"Searching layer with pattern: {pattern}", "Debug")
+        
         for layer in QgsProject.instance().mapLayers().values():
             if re.search(pattern, layer.name()):
+                QgsMessageLog.logMessage(f"Found layer: {layer.name()}", "Debug")
+                QgsMessageLog.logMessage(f"Fields: {[f.name() for f in layer.fields()]}", "Debug")
                 iface.setActiveLayer(layer)
                 self.setup_selection_tool(layer)
-                self.update_status(f"Ready - Click on an analysis to select it")
                 break
 
     def setup_selection_tool(self, layer):
         """
         Configure l'outil de sélection d'entité sur la carte.
-
-        - Associe l'outil à la couche sélectionnée
-        - Réinitialise l'affichage
         """
+        # Vérifie que les champs nécessaires existent
+        id_field = Config.get_id_field()
+        label_field = Config.get_label_field()
+        
+        if id_field not in layer.fields().names():
+            self.update_status(f"Error: Field '{id_field}' not found in layer", error=True)
+            return
+            
         self.selection_tool = QgsMapToolIdentifyFeature(iface.mapCanvas())
         self.selection_tool.setLayer(layer)
         self.selection_tool.featureIdentified.connect(self.on_feature_selected)
         iface.mapCanvas().setMapTool(self.selection_tool)
 
+        # Reset UI
         self.selected_object_label.clear()
         self.selected_object_label.setPlaceholderText("No analysis selected")
-
         self.ok_btn.setEnabled(False)
         self.kml_btn.setEnabled(False)
-
-        self.selected_feature = None
+        self.selected_analysis = None
 
     def on_feature_selected(self, feature):
-        """
-        Réagit à la sélection d'une entité sur la carte.
-
-        - Vérifie l'identifiant de l'entité
-        - Active les boutons d'action
-        - Affiche les infos de l'entité sélectionnée
-        """
         try:
-            self.selected_feature = feature
-
-            if 'id' not in feature.fields().names():
-                raise ValueError("Object has no 'id' field")
-            feature_id = feature.attribute('id')
+            self.selected_analysis = feature
+            
+            # Debug
+            QgsMessageLog.logMessage(f"Selected feature fields: {feature.fields().names()}", "Debug")
+            
+            id_field = Config.get_id_field()
+            label_field = Config.get_label_field()
+            
+            if id_field not in feature.fields().names():
+                raise ValueError(f"ID field '{id_field}' not found in feature")
+                
+            feature_id = feature.attribute(id_field)
             if feature_id is None:
                 raise ValueError("ID field is empty")
-            label = feature.attribute('label') if 'label' in feature.fields().names() else f"FC_{feature_id}"
-            self.selected_object_label.setText(f"ID: {feature_id} | Label: {label}")
-
+                
+            label = feature.attribute(label_field) if label_field in feature.fields().names() else f"id_{feature_id}"
+            
+            self.selected_object_label.setText(f"ID: {feature_id} | Name: {label}")
             self.ok_btn.setEnabled(True)
             self.kml_btn.setEnabled(True)
-
-            self.update_status(f"Analysis selected - Ready to generate report or export KML")
-
+            
         except Exception as e:
             self.update_status(f"Error: {str(e)}", error=True)
-            self.selected_object_label.setText(f"Error: {str(e)}")
-            QgsMessageLog.logMessage(f"Feature selection error: {str(e)}", "FC Report", Qgis.Critical)
+            QgsMessageLog.logMessage(f"Selection error: {str(e)}\nFields: {feature.fields().names() if 'feature' in locals() else 'No feature'}", 
+                                "ABEI GIS", Qgis.Critical)
 
     def closeEvent(self, event):
         """

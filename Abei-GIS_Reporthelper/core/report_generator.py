@@ -64,7 +64,7 @@ class ReportGenerator:
         current_date = QDateTime.currentDateTime().toString("dd/MM/yyyy")
         footer = doc.sections[0].footer
         footer_paragraph = footer.paragraphs[0]
-        footer_paragraph.text = f"({current_date}) - ENVIRONMENTAL AND URBAN PLANNING ANALYSIS - {self.layer_manager.fc_label}"
+        footer_paragraph.text = f"({current_date}) - {Config.FOOTER_MIDDLE_TEXT} - {self.layer_manager.analysis_label}"
         footer_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     def _add_general_info(self, doc):
@@ -81,13 +81,13 @@ class ReportGenerator:
         rows = info_table.rows
 
         data = [
-            ("NAME OF PROJECT OR LANDOWNER", self.layer_manager.fc_label),
-            ("TECHNOLOGY", self.layer_manager.fc_data['name']),
+            ("NAME OF PROJECT OR LANDOWNER", self.layer_manager.analysis_label),
+            ("TECHNOLOGY", self.layer_manager.analysis_data['technology']),
             ("COUNTY", ""),
             ("TOWNSHIP", ""),
             ("DATE", QDateTime.currentDateTime().toString("dd/MM/yyyy")),
             ("PROJECT DEVELOPER", ""),
-            ("ENVIRONMENTAL TECHNICIAN", Config.PROJECT_TECHNICIANS.get(QgsProject.instance().baseName(), ""))
+            ("ENVIRONMENTAL TECHNICIAN", (QgsProject.instance().baseName()))
         ]
 
         for i, (label, value) in enumerate(data):
@@ -144,16 +144,16 @@ class ReportGenerator:
         """
         row_cells = table.add_row().cells
 
-        unique_labels = sorted(set(f["label"] for f in feats))
+        unique_labels = sorted(set(f[Config.get_label_field()] for f in feats))
         row_cells[0].text = "\n".join(f"• {label}" for label in unique_labels)
 
         theme_str = str(feats[0]['theme']).strip()
-        subset = f"{self.layer_manager.fc_data['id_field']} = '{self.layer_manager.fc_id}' AND type_restriction = '1' AND theme = '{theme_str}'"
+        subset = f"{self.layer_manager.analysis_data['id_field']} = '{self.layer_manager.analysis_id}' AND type_restriction = {Config.get_type_restri_strict()} AND theme = '{theme_str}'"
 
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
             temp_img_path = temp_file.name
 
-        self.image_exporter.export_image(self.layer_manager.fc_extent, temp_img_path, subset)
+        self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
 
         try:
             row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(3.5))
@@ -174,15 +174,15 @@ class ReportGenerator:
         :param table: Objet table Word
         :param feats: Liste d'entités à afficher individuellement
         """
-        for label in sorted(set(f["label"] for f in feats)):
+        for label in sorted(set(f[Config.get_label_field()] for f in feats)):
             row_cells = table.add_row().cells
             row_cells[0].text = label
 
             with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
                 temp_img_path = temp_file.name
 
-            subset = f"{self.layer_manager.fc_data['id_field']} = '{self.layer_manager.fc_id}' AND type_restriction = '1' AND label = '{label.replace("'", "''")}'"
-            self.image_exporter.export_image(self.layer_manager.fc_extent, temp_img_path, subset)
+            subset = f"{self.layer_manager.analysis_data['id_field']} = '{self.layer_manager.analysis_id}' AND type_restriction = {Config.get_type_restri_strict()} AND label = '{label.replace("'", "''")}'"
+            self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
 
             try:
                 row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(3.5))
@@ -212,7 +212,7 @@ class ReportGenerator:
         self._add_header(doc)
         self._add_footer(doc)
 
-        title = doc.add_heading(f'First Check - GIS report [Vmap]', level=0)
+        title = doc.add_heading(Config.FC_WORD_TITLE_TEXT, level=0)
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         self._add_general_info(doc)
@@ -226,7 +226,7 @@ class ReportGenerator:
         for theme_name, feats in grouped_by_theme.items():
             self._add_theme_section(doc, theme_name, feats, grouped=False)
 
-        doc_path = os.path.join(self.report_directory, f"[Vmap-Report]FirstCheck{self.layer_manager.fc_data['name']}={self.layer_manager.fc_label}.docx")
+        doc_path = os.path.join(self.report_directory, f"[Vmap-Report]{Config.get_analyse_type()}{self.layer_manager.analysis_data['technology']}={self.layer_manager.analysis_label}.docx")
         doc.save(doc_path)
         QgsMessageLog.logMessage(f"Word document created: {doc_path}", "[Abei GIS] Report helper", Qgis.Success)
         return doc_path

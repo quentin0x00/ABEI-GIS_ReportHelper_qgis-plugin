@@ -24,7 +24,7 @@ from qgis.PyQt.QtWidgets import (
     QAction, QFileDialog, QMessageBox, QDialog,
     QVBoxLayout, QLabel, QComboBox, QPushButton,
     QListWidget, QAbstractItemView, QHBoxLayout,
-    QDockWidget, QWidget, QFrame, QLineEdit
+    QDockWidget, QWidget, QFrame, QLineEdit, QRadioButton  
 )
 from qgis.utils import iface
 from qgis.gui import QgsMapToolIdentifyFeature, QgsDockWidget

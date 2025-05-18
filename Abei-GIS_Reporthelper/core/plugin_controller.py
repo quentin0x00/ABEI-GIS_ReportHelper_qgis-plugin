@@ -27,16 +27,16 @@ class PluginController:
         - Crée les fichiers KML : zone source, zone de faisabilité, restrictions
         """
         try:
-            if not self.widget.selected_feature:
+            if not self.widget.selected_analysis:
                 raise ValueError("No analysis selected")
 
-            fc_type = self.widget.fc_type_combo.currentData()
-            if not fc_type:
+            technology = self.widget.technology_combo.currentData()
+            if not technology:
                 raise ValueError("Please select a technology type")
 
-            config = Config.FC_CONFIG[fc_type]
+            config = Config.get_config(technology)
 
-            layer_name_pattern = config['area_layer_pattern']
+            layer_name_pattern = config['global_area_layer']
             matching_layers = [layer for layer in QgsProject.instance().mapLayers().values()
                             if re.search(layer_name_pattern, layer.name())]
 
@@ -45,8 +45,8 @@ class PluginController:
 
             layer = matching_layers[0]
             iface.setActiveLayer(layer)
-            fc_id = self.widget.selected_feature['id']
-            fc_label = self.widget.selected_feature['label'] if 'label' in self.widget.selected_feature.fields().names() else f"FC{fc_id}"
+            analysis_id = self.widget.selected_analysis[Config.get_id_field()]
+            analysis_label = self.widget.selected_analysis[Config.get_label_field()] if Config.get_label_field() in self.widget.selected_analysis.fields().names() else f"id_{analysis_id}"
 
             output_dir = QFileDialog.getExistingDirectory(
                 self.widget,
@@ -58,12 +58,12 @@ class PluginController:
                 return
 
             current_datetime = QDateTime.currentDateTime().toString("dd-MM-yyyy_hh'h'mm")
-            parent_directory = os.path.join(output_dir, f"[Vmap-KML]{config['name']}-FirstCheck={fc_label}")
+            parent_directory = os.path.join(output_dir, f"[Vmap-KML]{config['technology']}-{Config.get_analyse_type()}={analysis_label}")
             os.makedirs(parent_directory, exist_ok=True)
 
-            KMLEXporter.export_source_area_kml(layer, fc_id, fc_label, parent_directory)
-            KMLEXporter.export_feasible_area_kml(config, fc_id, parent_directory)
-            KMLEXporter.export_restrictions_kml(config, fc_id, parent_directory)
+            KMLEXporter.export_source_area_kml(layer, analysis_id, analysis_label, parent_directory)
+            KMLEXporter.export_feasible_area_kml(config, analysis_id, parent_directory)
+            KMLEXporter.export_restrictions_kml(config, analysis_id, parent_directory)
 
             QMessageBox.information(
                 self.widget,
@@ -91,18 +91,18 @@ class PluginController:
         Affiche un message d’erreur en cas de problème, avec infos utiles.
         """
         try:
-            if not self.widget.selected_feature:
+            if not self.widget.selected_analysis:
                 raise ValueError("No object selected")
 
             # 1. Get configuration
-            fc_type = self.widget.fc_type_combo.currentData()
-            if not fc_type:
+            technology = self.widget.technology_combo.currentData()
+            if not technology:
                 raise ValueError("Please select a technology type")
 
-            config = Config.FC_CONFIG[fc_type]
+            config = Config.get_config(technology)
 
             # 2. Check and select the correct layer
-            layer_name_pattern = config['area_layer_pattern']
+            layer_name_pattern = config['global_area_layer']
             matching_layers = [layer for layer in QgsProject.instance().mapLayers().values()
                             if re.search(layer_name_pattern, layer.name())]
 
@@ -113,8 +113,8 @@ class PluginController:
             iface.setActiveLayer(layer)
 
             # 3. Get ID and label directly as in the action script
-            fc_id = self.widget.selected_feature['id']
-            fc_label = self.widget.selected_feature['label'] if 'label' in self.widget.selected_feature.fields().names() else f"FC{fc_id}"
+            analysis_id = self.widget.selected_analysis[Config.get_id_field()]
+            analysis_label = self.widget.selected_analysis['label'] if 'label' in self.widget.selected_analysis.fields().names() else f"id_{analysis_id}"
 
             # 4. Ask for output directory
             output_dir = QFileDialog.getExistingDirectory(
@@ -127,7 +127,7 @@ class PluginController:
                 return
 
             # 5. Initialize managers
-            layer_manager = LayerManager(layer.name(), fc_id, fc_label)
+            layer_manager = LayerManager(layer.name(), analysis_id, analysis_label)
             layer_manager.setup_layers()
 
             # 6. Group features
@@ -159,10 +159,9 @@ class PluginController:
             {str(e)}
 
             Available fields in layer:
-            {self.widget.selected_feature.fields().names() if hasattr(self.widget, 'selected_feature') and self.widget.selected_feature else 'No object selected'}
+            {self.widget.selected_analysis.fields().names() if hasattr(self.widget, 'selected_analysis') and self.widget.selected_analysis else 'No object selected'}
 
             Expected configuration:
-            {Config.FC_CONFIG.get(self.widget.fc_type_combo.currentData(), {})}"""
+            {config}"""  # <-- Utilisez directement la config déjà récupérée
 
             QMessageBox.critical(self.widget, "Critical Error", error_msg)
-            QgsMessageLog.logMessage(error_msg, "FC Report", Qgis.Critical)

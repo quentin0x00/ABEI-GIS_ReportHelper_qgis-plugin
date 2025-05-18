@@ -54,47 +54,62 @@ class KMLEXporter:
         return error
 
     @staticmethod
-    def export_source_area_kml(layer, fc_id, fc_label, output_dir):
+    def export_source_area_kml(layer, analysis_id, analysis_label, output_dir):
         """
-        Exporte la zone source en fichier KML.
-
-        :param layer: La couche source contenant les données.
-        :param fc_id: L'ID de la fonctionnalité.
-        :param fc_label: Le label de la fonctionnalité.
-        :param output_dir: Le répertoire de sortie pour les fichiers KML.
+        Exporte la zone source en KML, gère automatiquement le cas DC sans source_buffer.
         """
-        features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(f"id = {fc_id}"))
-        if not features:
-            return
+        try:
+            # 1. Récupère l'entité
+            features = list(layer.getFeatures(
+                QgsFeatureRequest().setFilterExpression(f"{Config.get_id_field()} = {analysis_id}")
+            ))
+            if not features:
+                QgsMessageLog.logMessage(
+                    f"No features found for ID {analysis_id}",
+                    "ABEI GIS", Qgis.Warning
+                )
+                return
 
-        buffer_value = None
-        for feature in features:
-            buffer_value = feature['source_buffer']
-            break
+            # 2. Détermine le nom du fichier
+            buffer_km = ""
+            if Config.CURRENT_MODE == 'FC' and 'source_buffer' in features[0].fields():
+                buffer_value = features[0]['source_buffer']
+                if buffer_value is not None:
+                    buffer_km = f"_{int(buffer_value) // 1000}km"
+            
+            output_filename = f"Source-area{buffer_km}.kml"
+            output_path = os.path.join(output_dir, output_filename)
 
-        if buffer_value is not None:
-            buffer_km = int(buffer_value) // 1000
-            output_filename = f"Source-area{buffer_km}km.kml"
-        else:
-            output_filename = "Source-area.kml"
+            # 3. Export KML avec les champs adaptés
+            fields_to_export = {
+                k: v for k, v in Config.get_kml_source_fields().items() 
+                if k in features[0].fields()
+            }
 
-        features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(f"id = {fc_id}"))
-        output_path = os.path.join(output_dir, output_filename)
+            error = KMLEXporter.export_kml(
+                layer.getFeatures(QgsFeatureRequest().setFilterExpression(f"{Config.get_id_field()} = {analysis_id}")),
+                output_path,
+                fields_to_export=fields_to_export,
+                layer_name="source_area"
+            )
 
-        error = KMLEXporter.export_kml(features, output_path,
-                     fields_to_export={"id": QVariant.Int, "label": QVariant.String, "source_buffer": QVariant.Int},
-                     layer_name="source_area")
+            if error[0] != QgsVectorFileWriter.NoError:
+                raise Exception(f"KML export error: {error[1]}")
 
-        if error[0] != QgsVectorFileWriter.NoError:
-            raise Exception(f"Error exporting source area: {error[1]}")
+        except Exception as e:
+            QgsMessageLog.logMessage(
+                f"Error in export_source_area_kml: {str(e)}",
+                "ABEI GIS", Qgis.Critical
+            )
+            raise
 
     @staticmethod
-    def export_feasible_area_kml(config, fc_id, output_dir):
+    def export_feasible_area_kml(config, analysis_id, output_dir):
         """
         Exporte la zone faisable en fichier KML.
 
         :param config: La configuration contenant les informations de la couche faisable.
-        :param fc_id: L'ID de la fonctionnalité.
+        :param analysis_id: L'ID de la fonctionnalité.
         :param output_dir: Le répertoire de sortie pour les fichiers KML.
         """
         feasible_layer = QgsProject.instance().mapLayersByName(config['feasible_layer'])
@@ -102,7 +117,7 @@ class KMLEXporter:
             return
 
         feasible_layer = feasible_layer[0]
-        request = QgsFeatureRequest().setFilterExpression(f"id = {fc_id}")
+        request = QgsFeatureRequest().setFilterExpression(f"{Config.get_id_field()} = {analysis_id}")
         features = list(feasible_layer.getFeatures(request))
 
         if not features:
@@ -110,19 +125,19 @@ class KMLEXporter:
 
         output_path = os.path.join(output_dir, f"Feasible-area_with_conditional.kml")
         error = KMLEXporter.export_kml(features, output_path,
-                     fields_to_export={"id": QVariant.Int, "label": QVariant.String},
+                     fields_to_export=Config.get_kml_feasible_fields(),
                      layer_name="feasible_area")
 
         if error[0] != QgsVectorFileWriter.NoError:
             raise Exception(f"Error exporting feasible area: {error[1]}")
 
     @staticmethod
-    def export_restrictions_kml(config, fc_id, output_dir):
+    def export_restrictions_kml(config, analysis_id, output_dir):
         """
         Exporte les restrictions en fichier KML.
 
         :param config: La configuration contenant les informations de la couche des restrictions.
-        :param fc_id: L'ID de la fonctionnalité.
+        :param analysis_id: L'ID de la fonctionnalité.
         :param output_dir: Le répertoire de sortie pour les fichiers KML.
         """
         restriction_layer = QgsProject.instance().mapLayersByName(config['restriction_layer'])
@@ -130,7 +145,7 @@ class KMLEXporter:
             return
 
         restriction_layer = restriction_layer[0]
-        request = QgsFeatureRequest().setFilterExpression(f"{config['id_field']} = '{fc_id}' AND type_restriction = '1'")
+        request = QgsFeatureRequest().setFilterExpression(f"{config['id_field']} = '{analysis_id}' AND type_restriction = {Config.get_type_restri_strict()}")
         features = list(restriction_layer.getFeatures(request))
 
         if not features:
@@ -149,7 +164,7 @@ class KMLEXporter:
         for theme_name, feats in grouped_by_theme.items():
             output_path = os.path.join(output_dir, f"[all-restrictions]{theme_name}.kml")
             error = KMLEXporter.export_kml(feats, output_path,
-                         fields_to_export={config['id_field']: QVariant.String, "id": QVariant.Int, "label": QVariant.String},
+                         fields_to_export={config['id_field']: QVariant.String, Config.get_restri_id(): QVariant.Int, "label": QVariant.String},
                          layer_name="restrictions")
 
             if error[0] != QgsVectorFileWriter.NoError:
@@ -160,14 +175,14 @@ class KMLEXporter:
             theme_raw = feats[0]['theme']
             theme_str = str(theme_raw).strip()
             theme_name = Config.THEMES_DICT.get(theme_str, "Unknown") if theme_str.isdigit() else theme_str or "Unknown"
-            safelabel = label.replace(" ", "").replace("/", "").replace("\\", "")
+            safelabel = label.replace(" ", "").replace("/", "").replace("\\", "").replace(".","")
 
             theme_directory = os.path.join(output_dir, "detailed-restrictions", theme_name)
             os.makedirs(theme_directory, exist_ok=True)
 
             output_path = os.path.join(theme_directory, f"{safelabel}.kml")
             error = KMLEXporter.export_kml(feats, output_path,
-                         fields_to_export={config['id_field']: QVariant.String, "id": QVariant.Int, "label": QVariant.String},
+                         fields_to_export={config['id_field']: QVariant.String, Config.get_restri_id(): QVariant.Int, "label": QVariant.String},
                          layer_name="restriction")
 
             if error[0] != QgsVectorFileWriter.NoError:
