@@ -98,13 +98,18 @@ class FCReportDock(QDockWidget):
         # Controls
         # Mode selector
         mode_layout = QHBoxLayout()
+        mode_widget = QWidget() 
+        mode_widget.setLayout(mode_layout)
+        self.layout.addWidget(mode_widget, alignment=Qt.AlignCenter)
         self.radio_fc = QRadioButton("First Check")
         self.radio_dc = QRadioButton("Double Check")
         self.radio_fc.setChecked(True)  # FC par défaut
         # mode_layout.addWidget(QLabel("Select mode:"))
+        mode_layout.addStretch()
         mode_layout.addWidget(self.radio_fc)
+        mode_layout.addSpacing(20)  # Espace entre les boutons
         mode_layout.addWidget(self.radio_dc)
-        self.layout.addLayout(mode_layout)
+        mode_layout.addStretch()
 
         self.radio_fc.toggled.connect(lambda: self.switch_mode('FC'))
         self.radio_dc.toggled.connect(lambda: self.switch_mode('DC'))
