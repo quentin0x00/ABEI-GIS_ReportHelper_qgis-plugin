@@ -13,7 +13,8 @@ class FCReportGeneratorPlugin:
         """
         self.iface = iface
         self.plugin_dir = os.path.dirname(__file__)
-
+        self.reloadable = True
+        
         icons_path = os.path.join(self.plugin_dir, 'icons')
         if icons_path not in sys.path:
             sys.path.insert(0, icons_path)

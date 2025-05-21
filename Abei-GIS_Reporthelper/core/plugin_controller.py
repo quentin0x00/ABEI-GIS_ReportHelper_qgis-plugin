@@ -6,26 +6,10 @@ from ..config import Config
 from .image_exporter import ImageExporter
 
 class PluginController:
-    """Contrôleur principal du plugin — gère les actions d'export et de génération de rapports."""
-
     def __init__(self, widget):
-        """
-        Initialise le contrôleur du plugin.
-
-        :param widget: DockWidget graphique principal (interface utilisateur)
-        """
         self.widget = widget
 
     def export_to_kml(self):
-        """
-        Interface du plugin. Exporte les données au format KML.
-
-        Étapes :
-        - Vérifie qu’un objet est sélectionné et qu’une technologie est choisie
-        - Récupère la couche correspondante via un motif (regex)
-        - Demande un dossier de sortie à l'utilisateur
-        - Crée les fichiers KML : zone source, zone de faisabilité, restrictions
-        """
         try:
             if not self.widget.selected_analysis:
                 raise ValueError("No analysis selected")

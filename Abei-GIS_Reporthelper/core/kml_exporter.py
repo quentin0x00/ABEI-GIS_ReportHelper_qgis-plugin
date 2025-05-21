@@ -145,7 +145,7 @@ class KMLEXporter:
             return
 
         restriction_layer = restriction_layer[0]
-        request = QgsFeatureRequest().setFilterExpression(f"{config['id_field']} = '{analysis_id}' AND type_restriction = {Config.get_type_restri_strict()}")
+        request = QgsFeatureRequest().setFilterExpression(f"{config['id_field']} = '{analysis_id}' AND type_restriction = '{Config.get_type_restri_strict()}'")
         features = list(restriction_layer.getFeatures(request))
 
         if not features:

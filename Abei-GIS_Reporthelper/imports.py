@@ -11,7 +11,7 @@ from qgis.core import (
     QgsMessageLog, Qgis, QgsSettings,
     QgsFields, QgsField, QgsFeature,
     QgsVectorLayer, QgsVectorFileWriter,
-    QgsCoordinateReferenceSystem, QgsWkbTypes
+    QgsCoordinateReferenceSystem, QgsWkbTypes, QgsApplication
 )
 from qgis.PyQt.QtCore import (
     QSize, QDateTime, QTranslator,
@@ -24,7 +24,16 @@ from qgis.PyQt.QtWidgets import (
     QAction, QFileDialog, QMessageBox, QDialog,
     QVBoxLayout, QLabel, QComboBox, QPushButton,
     QListWidget, QAbstractItemView, QHBoxLayout,
-    QDockWidget, QWidget, QFrame, QLineEdit, QRadioButton  
+    QDockWidget, QWidget, QFrame, QLineEdit, QRadioButton, QTabWidget,     QDialogButtonBox,
+    QFormLayout,
+    QScrollArea,
+    QGroupBox,
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QPushButton,
+    QLineEdit,
+    QTabWidget,
 )
 from qgis.utils import iface
 from qgis.gui import QgsMapToolIdentifyFeature, QgsDockWidget

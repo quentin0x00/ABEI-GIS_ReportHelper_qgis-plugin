@@ -1,7 +1,12 @@
 from ..imports import *
 from ..config import Config
+from .config_window import ConfigEditorDialog
 from ..core.plugin_controller import PluginController
 from .stylesheet import STYLESHEET
+
+import os
+import sys
+import subprocess
 
 class FCReportDock(QDockWidget):
     """
@@ -86,8 +91,27 @@ class FCReportDock(QDockWidget):
         title.setStyleSheet("font-weight: bold; font-size: 14px; color: #212529;")
         header_layout.addWidget(title)
         header_layout.addStretch()
+        
+        # Bouton Paramètres
+        self.settings_btn = QPushButton()
+        self.settings_btn.setIcon(QgsApplication.getThemeIcon("mActionOptions.svg"))
+        self.settings_btn.setToolTip("Open configuration file")
+        self.settings_btn.setFixedSize(28, 28)
+        self.settings_btn.setStyleSheet("""
+            border: none;
+            background: transparent;
+            padding: 0;
+        }
+        QPushButton:hover {
+            background-color: #e0e0e0;  /* gris clair */
+        }
+        """)
+
+        self.settings_btn.clicked.connect(self.open_config_file)
+        header_layout.addWidget(self.settings_btn)
 
         self.layout.addWidget(header)
+
 
         separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
@@ -279,3 +303,15 @@ class FCReportDock(QDockWidget):
         if self.selection_tool:
             iface.mapCanvas().unsetMapTool(self.selection_tool)
         super().closeEvent(event)
+        
+
+    def open_config_file(self):
+        """Ouvre l'éditeur de configuration intégré"""
+        try:
+            editor = ConfigEditorDialog(self)
+            editor.exec_()
+            self.update_status("Configuration updated successfully")
+        except Exception as e:
+            error_msg = f"Error opening configuration editor: {str(e)}"
+            QgsMessageLog.logMessage(error_msg, "ABEI GIS", Qgis.Critical)
+            self.update_status(error_msg, error=True)
