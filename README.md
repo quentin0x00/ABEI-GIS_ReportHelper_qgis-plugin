@@ -1,6 +1,6 @@
 # [ABEI GIS] Report-Helper
 
-**A QGIS Plugin to generate Word reports, screenshots and kml for First Check environmental analysis.**
+**A QGIS Plugin to generate Word reports, screenshots and kml for environmental analysis.**
 
 - **Generate Word reports**  
   Includes screenshots of individual restrictions and theme-grouped restrictions in a Word documents, formated in table displaying details of the restrictions.
