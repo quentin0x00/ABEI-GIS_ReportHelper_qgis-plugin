@@ -164,7 +164,7 @@ class KMLEXporter:
         for theme_name, feats in grouped_by_theme.items():
             output_path = os.path.join(output_dir, f"[all-restrictions]{theme_name}.kml")
             error = KMLEXporter.export_kml(feats, output_path,
-                         fields_to_export={config['id_field']: QVariant.String, Config.get_restri_id(): QVariant.Int, "label": QVariant.String},
+                         fields_to_export={config['restri_join_id_field']: QVariant.String, Config.get_restri_id(): QVariant.Int, "label": QVariant.String},
                          layer_name="restrictions")
 
             if error[0] != QgsVectorFileWriter.NoError:
@@ -182,7 +182,7 @@ class KMLEXporter:
 
             output_path = os.path.join(theme_directory, f"{safelabel}.kml")
             error = KMLEXporter.export_kml(feats, output_path,
-                         fields_to_export={config['id_field']: QVariant.String, Config.get_restri_id(): QVariant.Int, "label": QVariant.String},
+                         fields_to_export={config['restri_join_id_field']: QVariant.String, Config.get_restri_id(): QVariant.Int, "label": QVariant.String},
                          layer_name="restriction")
 
             if error[0] != QgsVectorFileWriter.NoError:

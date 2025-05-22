@@ -62,19 +62,6 @@ class ConfigEditorDialog(QDialog):
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
         
-    def _create_general_fields(self, layout):
-        """Crée les champs pour les constantes générales"""
-        form_layout = QFormLayout()
-        layout.addLayout(form_layout)
-        
-        self.plugin_name_edit = QLineEdit()
-        form_layout.addRow("Plugin Name:", self.plugin_name_edit)
-        
-        self.footer_text_edit = QLineEdit()
-        form_layout.addRow("Footer Text:", self.footer_text_edit)
-        
-        self.basemap_edit = QLineEdit()
-        form_layout.addRow("Basemap:", self.basemap_edit)
         
     def _create_fc_fields(self, layout):
         """Crée les champs pour les constantes FC"""
@@ -134,12 +121,30 @@ class ConfigEditorDialog(QDialog):
             form_layout.addRow(f"Theme {key}:", edit)
             self.theme_edits[key] = edit
             
+
+
+    def _create_general_fields(self, layout):
+        """Crée les champs pour les constantes générales avec menu déroulant pour le basemap"""
+        form_layout = QFormLayout()
+        layout.addLayout(form_layout)
+        
+        self.plugin_name_edit = QLineEdit()
+        form_layout.addRow("Plugin Name:", self.plugin_name_edit)
+        
+        self.footer_text_edit = QLineEdit()
+        form_layout.addRow("Footer Text:", self.footer_text_edit)
+        
+        # Menu déroulant pour le basemap
+        self.basemap_combo = QComboBox()
+        self._populate_layer_combo(self.basemap_combo, Config.BASEMAP)
+        form_layout.addRow("Basemap:", self.basemap_combo)
+
     def _create_config_fields(self, layout):
-        """Crée les champs pour les configurations FC et DC - Version corrigée"""
+        """Crée les champs pour les configurations FC et DC avec menus déroulants pour les couches"""
         notebook = QTabWidget()
         layout.addWidget(notebook)
         
-        # Config FC - Correction ici
+        # Config FC
         fc_config_tab = QWidget()
         fc_config_layout = QVBoxLayout()
         fc_config_scroll = QScrollArea()
@@ -157,17 +162,24 @@ class ConfigEditorDialog(QDialog):
             
             tech_edits = {}
             for field, value in tech_config.items():
-                edit = QLineEdit()
-                # Conversion spéciale pour QVariant
-                if isinstance(value, type(QVariant.Int)):
-                    edit.setText('QVariant.Int')
+                if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
+                    # Menu déroulant pour les couches
+                    combo = QComboBox()
+                    self._populate_layer_combo(combo, value)
+                    group_layout.addRow(f"{field}:", combo)
+                    tech_edits[field] = combo
                 else:
-                    edit.setText(str(value))
-                group_layout.addRow(f"{field}:", edit)
-                tech_edits[field] = edit
+                    # Champ texte normal pour les autres champs
+                    edit = QLineEdit()
+                    if isinstance(value, type(QVariant.Int)):
+                        edit.setText('QVariant.Int')
+                    else:
+                        edit.setText(str(value))
+                    group_layout.addRow(f"{field}:", edit)
+                    tech_edits[field] = edit
             self.fc_config_edits[tech_code] = tech_edits
         
-        # Config DC - Même correction
+        # Config DC
         dc_config_tab = QWidget()
         dc_config_layout = QVBoxLayout()
         dc_config_scroll = QScrollArea()
@@ -185,20 +197,30 @@ class ConfigEditorDialog(QDialog):
             
             tech_edits = {}
             for field, value in tech_config.items():
-                edit = QLineEdit()
-                if isinstance(value, type(QVariant.Int)):
-                    edit.setText('QVariant.Int')
+                if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
+                    # Menu déroulant pour les couches
+                    combo = QComboBox()
+                    self._populate_layer_combo(combo, value)
+                    group_layout.addRow(f"{field}:", combo)
+                    tech_edits[field] = combo
                 else:
-                    edit.setText(str(value))
-                group_layout.addRow(f"{field}:", edit)
-                tech_edits[field] = edit
+                    # Champ texte normal pour les autres champs
+                    edit = QLineEdit()
+                    if isinstance(value, type(QVariant.Int)):
+                        edit.setText('QVariant.Int')
+                    else:
+                        edit.setText(str(value))
+                    group_layout.addRow(f"{field}:", edit)
+                    tech_edits[field] = edit
             self.dc_config_edits[tech_code] = tech_edits
             
     def _load_config_values(self):
         """Charge les valeurs actuelles dans les champs"""
         self.plugin_name_edit.setText(Config.PLUGIN_NAME)
         self.footer_text_edit.setText(Config.FOOTER_MIDDLE_TEXT)
-        self.basemap_edit.setText(Config.BASEMAP)
+        index = self.basemap_combo.findText(Config.BASEMAP)
+        if index >= 0:
+            self.basemap_combo.setCurrentIndex(index)
         
         # FC
         self.fc_word_title_edit.setText(Config.FC_WORD_TITLE_TEXT)
@@ -213,14 +235,42 @@ class ConfigEditorDialog(QDialog):
         self.dc_restri_id_edit.setText(Config.DC_RESTRI_ID)
         self.dc_label_field_edit.setText(Config.DC_LABEL_FIELD)
         self.dc_type_restri_edit.setText(Config.DC_TYPE_RESTRI_STRICT)
+
+    def _populate_layer_combo(self, combo_box, default_value=None):
+        """Remplit un QComboBox avec les noms des couches du projet et sélectionne la valeur par défaut"""
+        combo_box.clear()
         
+        # Ajouter une entrée vide optionnelle
+        combo_box.addItem("", None)
+        
+        # Récupérer toutes les couches du projet
+        layers = QgsProject.instance().mapLayers().values()
+        layer_names = [layer.name() for layer in layers]
+        
+        # Trier les noms par ordre alphabétique
+        layer_names.sort()
+        
+        # Ajouter les noms au combo box
+        for name in layer_names:
+            combo_box.addItem(name, name)
+        
+        # Sélectionner la valeur par défaut si elle existe
+        if default_value:
+            index = combo_box.findText(default_value)
+            if index >= 0:
+                combo_box.setCurrentIndex(index)
+            else:
+                # Si la couche n'existe pas, l'ajouter comme élément spécial
+                combo_box.addItem(f"{default_value} (non trouvé)", default_value)
+                combo_box.setCurrentIndex(combo_box.count() - 1)
+
     def _save_config(self):
         """Sauvegarde les modifications dans le fichier de configuration"""
         try:
             # Constantes générales
             Config.PLUGIN_NAME = self.plugin_name_edit.text()
             Config.FOOTER_MIDDLE_TEXT = self.footer_text_edit.text()
-            Config.BASEMAP = self.basemap_edit.text()
+            Config.BASEMAP = self.basemap_combo.currentData() or self.basemap_combo.currentText()
             
             # FC
             Config.FC_WORD_TITLE_TEXT = self.fc_word_title_edit.text()
@@ -242,19 +292,33 @@ class ConfigEditorDialog(QDialog):
                 
             # Config FC
             for tech, edits in self.fc_config_edits.items():
-                for field, edit in edits.items():
-                    Config.FC_CONFIG[tech][field] = edit.text()
-                    if field == 'id_field':
-                        # Conversion en QVariant si nécessaire
-                        Config.FC_CONFIG[tech][field] = QVariant.Int if edit.text() == 'QVariant.Int' else edit.text()
+                for field, widget in edits.items():
+                    if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
+                        # Récupérer la valeur du QComboBox
+                        Config.FC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
+                    else:
+                        # Récupérer la valeur du QLineEdit
+                        value = widget.text()
+                        if field == 'id_field':
+                            # Conversion en QVariant si nécessaire
+                            Config.FC_CONFIG[tech][field] = QVariant.Int if value == 'QVariant.Int' else value
+                        else:
+                            Config.FC_CONFIG[tech][field] = value
             
             # Config DC
             for tech, edits in self.dc_config_edits.items():
-                for field, edit in edits.items():
-                    Config.DC_CONFIG[tech][field] = edit.text()
-                    if field == 'id_field':
-                        # Conversion en QVariant si nécessaire
-                        Config.DC_CONFIG[tech][field] = QVariant.Int if edit.text() == 'QVariant.Int' else edit.text()
+                for field, widget in edits.items():
+                    if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
+                        # Récupérer la valeur du QComboBox
+                        Config.DC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
+                    else:
+                        # Récupérer la valeur du QLineEdit
+                        value = widget.text()
+                        if field == 'id_field':
+                            # Conversion en QVariant si nécessaire
+                            Config.DC_CONFIG[tech][field] = QVariant.Int if value == 'QVariant.Int' else value
+                        else:
+                            Config.DC_CONFIG[tech][field] = value
             
             QMessageBox.information(self, "Success", "Configuration updated successfully!")
             self.accept()
