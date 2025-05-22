@@ -336,7 +336,7 @@ class ConfigEditorDialog(QDialog):
                         Config.FC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
                     else:
                         value = widget.text()
-                        if field == 'id_field':
+                        if field == 'restri_join_id_field':
                             Config.FC_CONFIG[tech][field] = QVariant.Int if value == 'QVariant.Int' else value
                         else:
                             Config.FC_CONFIG[tech][field] = value
@@ -348,7 +348,7 @@ class ConfigEditorDialog(QDialog):
                         Config.DC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
                     else:
                         value = widget.text()
-                        if field == 'id_field':
+                        if field == 'restri_join_id_field':
                             Config.DC_CONFIG[tech][field] = QVariant.Int if value == 'QVariant.Int' else value
                         else:
                             Config.DC_CONFIG[tech][field] = value

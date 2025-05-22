@@ -148,7 +148,7 @@ class ReportGenerator:
         row_cells[0].text = "\n".join(f"• {label}" for label in unique_labels)
 
         theme_str = str(feats[0]['theme']).strip()
-        subset = f"{self.layer_manager.analysis_data['id_field']} = '{self.layer_manager.analysis_id}' AND type_restriction = '{Config.get_type_restri_strict()}' AND theme = '{theme_str}'"
+        subset = f"{self.layer_manager.analysis_data['restri_join_id_field']} = '{self.layer_manager.analysis_id}' AND type_restriction = '{Config.get_type_restri_strict()}' AND theme = '{theme_str}'"
 
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
             temp_img_path = temp_file.name
@@ -181,7 +181,7 @@ class ReportGenerator:
             with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
                 temp_img_path = temp_file.name
 
-            subset = f"{self.layer_manager.analysis_data['id_field']} = '{self.layer_manager.analysis_id}' AND type_restriction = '{Config.get_type_restri_strict()}' AND label = '{label.replace("'", "''")}'"
+            subset = f"{self.layer_manager.analysis_data['restri_join_id_field']} = '{self.layer_manager.analysis_id}' AND type_restriction = '{Config.get_type_restri_strict()}' AND label = '{label.replace("'", "''")}'"
             self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
 
             try:
