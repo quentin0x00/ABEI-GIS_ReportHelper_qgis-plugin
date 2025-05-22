@@ -104,23 +104,49 @@ class ConfigEditorDialog(QDialog):
         form_layout.addRow("Type Restriction Strict:", self.dc_type_restri_edit)
         
     def _create_themes_fields(self, layout):
-        """Crée les champs pour les thèmes"""
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        content = QWidget()
-        scroll.setWidget(content)
-        layout.addWidget(scroll)
+        """Crée les champs pour les thèmes FC et DC"""
+        notebook = QTabWidget()
+        layout.addWidget(notebook)
         
-        form_layout = QFormLayout()
-        content.setLayout(form_layout)
+        # Onglet Thèmes FC
+        fc_themes_tab = QWidget()
+        fc_themes_scroll = QScrollArea()
+        fc_themes_scroll.setWidgetResizable(True)
         
-        self.theme_edits = {}
-        for key, value in Config.THEMES_DICT.items():
+        fc_themes_content = QWidget()
+        fc_themes_layout = QFormLayout(fc_themes_content)
+        fc_themes_scroll.setWidget(fc_themes_content)
+        
+        self.fc_theme_edits = {}
+        for key, value in Config.FC_THEMES_DICT.items():
             edit = QLineEdit()
             edit.setText(value)
-            form_layout.addRow(f"Theme {key}:", edit)
-            self.theme_edits[key] = edit
-            
+            fc_themes_layout.addRow(f"Theme {key}:", edit)
+            self.fc_theme_edits[key] = edit
+        
+        fc_themes_tab.setLayout(QVBoxLayout())
+        fc_themes_tab.layout().addWidget(fc_themes_scroll)
+        notebook.addTab(fc_themes_tab, "FC Themes")
+        
+        # Onglet Thèmes DC
+        dc_themes_tab = QWidget()
+        dc_themes_scroll = QScrollArea()
+        dc_themes_scroll.setWidgetResizable(True)
+        
+        dc_themes_content = QWidget()
+        dc_themes_layout = QFormLayout(dc_themes_content)
+        dc_themes_scroll.setWidget(dc_themes_content)
+        
+        self.dc_theme_edits = {}
+        for key, value in Config.DC_THEMES_DICT.items():
+            edit = QLineEdit()
+            edit.setText(value)
+            dc_themes_layout.addRow(f"Theme {key}:", edit)
+            self.dc_theme_edits[key] = edit
+        
+        dc_themes_tab.setLayout(QVBoxLayout())
+        dc_themes_tab.layout().addWidget(dc_themes_scroll)
+        notebook.addTab(dc_themes_tab, "DC Themes")  
 
 
     def _create_general_fields(self, layout):
@@ -236,6 +262,15 @@ class ConfigEditorDialog(QDialog):
         self.dc_label_field_edit.setText(Config.DC_LABEL_FIELD)
         self.dc_type_restri_edit.setText(Config.DC_TYPE_RESTRI_STRICT)
 
+        # Charger les thèmes FC
+        for key, edit in self.fc_theme_edits.items():
+            edit.setText(Config.FC_THEMES_DICT.get(key, ""))
+
+        # Charger les thèmes DC
+        for key, edit in self.dc_theme_edits.items():
+            edit.setText(Config.DC_THEMES_DICT.get(key, ""))
+            
+        
     def _populate_layer_combo(self, combo_box, default_value=None):
         """Remplit un QComboBox avec les noms des couches du projet et sélectionne la valeur par défaut"""
         combo_box.clear()
@@ -286,21 +321,22 @@ class ConfigEditorDialog(QDialog):
             Config.DC_LABEL_FIELD = self.dc_label_field_edit.text()
             Config.DC_TYPE_RESTRI_STRICT = self.dc_type_restri_edit.text()
             
-            # Thèmes
-            for key, edit in self.theme_edits.items():
-                Config.THEMES_DICT[key] = edit.text()
+            # Thèmes FC
+            for key, edit in self.fc_theme_edits.items():
+                Config.FC_THEMES_DICT[key] = edit.text()
+                
+            # Thèmes DC
+            for key, edit in self.dc_theme_edits.items():
+                Config.DC_THEMES_DICT[key] = edit.text()
                 
             # Config FC
             for tech, edits in self.fc_config_edits.items():
                 for field, widget in edits.items():
                     if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
-                        # Récupérer la valeur du QComboBox
                         Config.FC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
                     else:
-                        # Récupérer la valeur du QLineEdit
                         value = widget.text()
                         if field == 'id_field':
-                            # Conversion en QVariant si nécessaire
                             Config.FC_CONFIG[tech][field] = QVariant.Int if value == 'QVariant.Int' else value
                         else:
                             Config.FC_CONFIG[tech][field] = value
@@ -309,13 +345,10 @@ class ConfigEditorDialog(QDialog):
             for tech, edits in self.dc_config_edits.items():
                 for field, widget in edits.items():
                     if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
-                        # Récupérer la valeur du QComboBox
                         Config.DC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
                     else:
-                        # Récupérer la valeur du QLineEdit
                         value = widget.text()
                         if field == 'id_field':
-                            # Conversion en QVariant si nécessaire
                             Config.DC_CONFIG[tech][field] = QVariant.Int if value == 'QVariant.Int' else value
                         else:
                             Config.DC_CONFIG[tech][field] = value
