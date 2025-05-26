@@ -222,8 +222,7 @@ class ReportGenerator:
         for theme_value, feats in grouped_by_theme.items():
             display_name = Config.get_display_name(theme_value)
             # Ajout du nombre de restrictions dans le titre
-            title = f"{display_name} - {len(feats)} restriction(s)"
-            self._add_theme_section(doc, title, feats, grouped=True)
+            self._add_theme_section(doc, display_name, feats, grouped=True)
     
             
         # Section Individual

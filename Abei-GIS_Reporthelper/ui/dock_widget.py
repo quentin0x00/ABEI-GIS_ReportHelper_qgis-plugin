@@ -139,7 +139,7 @@ class FCReportDock(QDockWidget):
         self.radio_dc.toggled.connect(lambda: self.switch_mode('DC'))
 
         
-        self.layout.addWidget(QLabel("1. Select the technology:"))
+        self.layout.addWidget(QLabel("1. Select the technology"))
         self.technology_combo = QComboBox()
         self.technology_combo.setToolTip("Select the technology of the analysis")
         self.layout.addWidget(self.technology_combo)

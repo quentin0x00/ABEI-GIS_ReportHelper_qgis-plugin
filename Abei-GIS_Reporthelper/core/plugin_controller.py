@@ -101,6 +101,22 @@ class PluginController:
             if not output_dir:
                 return
 
+            restriction_layer_name = config['restriction_layer']
+            restriction_layer = next((l for l in QgsProject.instance().mapLayers().values()
+                                    if l.name() == restriction_layer_name), None)
+
+            if restriction_layer:
+                renderer = restriction_layer.renderer()
+                if hasattr(renderer, 'rootRule'):
+                    def enable_rules(rule):
+                        if hasattr(rule, 'children'):
+                            for child in rule.children():
+                                enable_rules(child)
+                        rule.setActive(True)
+
+                    enable_rules(renderer.rootRule())
+                    restriction_layer.triggerRepaint()
+
             # 5. Initialize LayerManager with the config
             layer_manager = LayerManager(
                 layer_name=layer.name(),
