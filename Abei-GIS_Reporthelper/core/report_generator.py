@@ -258,7 +258,7 @@ class ReportGenerator:
         self._add_global_feasible_restriction_map(doc)
         doc.add_paragraph()
 
-        doc.add_heading("GIS analysis - grouped restrictions by theme", level=1)
+        doc.add_heading("[GIS analysis] Strict restrictions - Grouped by theme", level=1)
         for theme_value, feats in grouped_by_theme.items():
             display_name = Config.get_display_name(theme_value)
             # Ajout du nombre de restrictions dans le titre
@@ -266,7 +266,7 @@ class ReportGenerator:
     
             
         # Section Individual
-        doc.add_heading("GIS analysis - individual restriction by label", level=1)
+        doc.add_heading("[GIS analysis] Strict restrictions - Individual detail", level=1)
         for theme_value, feats in grouped_by_theme.items():
             display_name = Config.get_display_name(theme_value)
             # On passe grouped=False pour avoir une ligne par label

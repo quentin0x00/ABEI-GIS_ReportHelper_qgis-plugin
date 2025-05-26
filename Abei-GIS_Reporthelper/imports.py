@@ -16,10 +16,10 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import (
     QSize, QDateTime, QTranslator,
-    QCoreApplication, QSettings, QVariant, Qt
+    QCoreApplication, QSettings, QVariant, Qt, QUrl  
 )
 from qgis.PyQt.QtGui import (
-    QIcon, QPixmap, QColor, QImage, QPainter, QFont, QCursor
+    QIcon, QPixmap, QColor, QImage, QPainter, QFont, QCursor, QDesktopServices  
 )
 from qgis.PyQt.QtWidgets import (
     QAction, QFileDialog, QMessageBox, QDialog,
