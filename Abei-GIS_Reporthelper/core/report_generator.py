@@ -220,12 +220,15 @@ class ReportGenerator:
         doc.add_paragraph()
 
         doc.add_heading("GIS analysis - grouped restrictions by theme", level=1)
-        for theme_name, feats in grouped_by_theme.items():
-            self._add_theme_section(doc, theme_name, feats, grouped=True)
-
+        for theme_value, feats in grouped_by_theme.items():
+            # CHANGEMENT ICI: On utilise get_theme_display_name pour les titres
+            display_name = Config.get_display_name(theme_value)
+            self._add_theme_section(doc, display_name, feats, grouped=True)
+            
         doc.add_heading("GIS analysis - individual restriction by theme", level=1)
-        for theme_name, feats in grouped_by_theme.items():
-            self._add_theme_section(doc, theme_name, feats, grouped=False)
+        for theme_value, feats in grouped_by_theme.items():
+            display_name = Config.get_display_name(theme_value)
+            self._add_theme_section(doc, display_name, feats, grouped=False)
 
         doc_path = os.path.join(self.report_directory, f"[Vmap-Report]{Config.get_analyse_type()}{self.layer_manager.analysis_data['technology']}={self.layer_manager.analysis_label}.docx")
         doc.save(doc_path)

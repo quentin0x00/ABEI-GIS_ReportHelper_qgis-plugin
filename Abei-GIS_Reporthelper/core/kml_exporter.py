@@ -123,7 +123,7 @@ class KMLEXporter:
         if not features:
             return
 
-        output_path = os.path.join(output_dir, f"Feasible-area_with_conditional.kml")
+        output_path = os.path.join(output_dir, f"Feasible-area.kml")
         error = KMLEXporter.export_kml(features, output_path,
                      fields_to_export=Config.get_kml_feasible_fields(),
                      layer_name="feasible_area")
@@ -155,29 +155,27 @@ class KMLEXporter:
         grouped_by_theme = defaultdict(list)
         for f in features:
             grouped_by_label[f["label"]].append(f)
-            theme_raw = f['theme']
-            theme_str = str(theme_raw).strip()
-            theme_name = Config.get_theme_name(theme_str) if theme_str.isdigit() else theme_str or "Unknown"
-            grouped_by_theme[theme_name].append(f)
+            theme_value = f['theme']
+            theme_display_name = Config.get_display_name(theme_value)
+            grouped_by_theme[theme_display_name].append(f)
 
         # Export all restrictions by theme
-        for theme_name, feats in grouped_by_theme.items():
-            output_path = os.path.join(output_dir, f"[all-restrictions]{theme_name}.kml")
+        for theme_display_name , feats in grouped_by_theme.items():
+            output_path = os.path.join(output_dir, f"[all-restrictions]{theme_display_name}.kml")
             error = KMLEXporter.export_kml(feats, output_path,
                          fields_to_export={config['restri_join_id_field']: QVariant.String, Config.get_restri_id(): QVariant.Int, "label": QVariant.String},
                          layer_name="restrictions")
 
             if error[0] != QgsVectorFileWriter.NoError:
-                raise Exception(f"Error exporting restrictions by theme {theme_name}: {error[1]}")
+                raise Exception(f"Error exporting restrictions by theme {theme_display_name}: {error[1]}")
 
         # Export detailed restrictions by label
         for label, feats in grouped_by_label.items():
-            theme_raw = feats[0]['theme']
-            theme_str = str(theme_raw).strip()
-            theme_name = Config.get_theme_name(theme_str) if theme_str.isdigit() else theme_str or "Unknown"
+            theme_value = feats[0]['theme']
+            theme_display_name = Config.get_display_name(theme_value)
             safelabel = label.replace(" ", "").replace("/", "").replace("\\", "").replace(".","")
 
-            theme_directory = os.path.join(output_dir, "detailed-restrictions", theme_name)
+            theme_directory = os.path.join(output_dir, "detailed-restrictions", theme_display_name)
             os.makedirs(theme_directory, exist_ok=True)
 
             output_path = os.path.join(theme_directory, f"{safelabel}.kml")

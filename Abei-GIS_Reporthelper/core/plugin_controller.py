@@ -114,11 +114,12 @@ class PluginController:
             features = layer_manager.get_restriction_features()
             grouped_by_theme = defaultdict(list)
 
+            # Dans la partie groupement des features:
             for f in features:
                 theme_raw = f['theme']
                 theme_str = str(theme_raw).strip()
-                theme_name = Config.get_theme_name(theme_str)
-                grouped_by_theme[theme_name].append(f)
+                # On garde la valeur originale pour le groupement
+                grouped_by_theme[theme_str].append(f)
 
             # 7. Generate report
             image_exporter = ImageExporter(layer_manager)

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="_all_restrictions_Culture" id="_all_restrictions_Culture">
+	<SimpleField name="fc_w_id" type="string"></SimpleField>
+	<SimpleField name="id" type="int"></SimpleField>
+	<SimpleField name="label" type="string"></SimpleField>
+</Schema>
+<Folder><name>_all_restrictions_Culture</name>
+  <Placemark id="_all_restrictions_Culture.1">
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#_all_restrictions_Culture">
+		<SimpleData name="fc_w_id">75</SimpleData>
+		<SimpleData name="id">41893</SimpleData>
+		<SimpleData name="label">denkmal</SimpleData>
+	</SchemaData></ExtendedData>
+      <MultiGeometry><Polygon><outerBoundaryIs><LinearRing><coordinates>9.28861332651634,51.7063764638877 9.28860402249619,51.7060824161095 9.288287685811,51.7060535877931 9.28823186169008,51.7059440400231 9.28825046973038,51.7057480065095 9.28785039686382,51.7057364750999 9.28789691696459,51.7056211608422 9.28753406017864,51.7055462064171 9.28732006771513,51.7057653036184 9.28696651494933,51.7057595379162 9.28672461042536,51.70628421381 9.28861332651634,51.7063764638877</coordinates></LinearRing></outerBoundaryIs></Polygon></MultiGeometry>
+  </Placemark>
+  <Placemark id="_all_restrictions_Culture.2">
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#_all_restrictions_Culture">
+		<SimpleData name="fc_w_id">75</SimpleData>
+		<SimpleData name="id">41894</SimpleData>
+		<SimpleData name="label">denkmal</SimpleData>
+	</SchemaData></ExtendedData>
+      <MultiGeometry><Polygon><outerBoundaryIs><LinearRing><coordinates>9.29102306773586,51.7039144754621 9.2913859245218,51.7037530289173 9.29174878130775,51.7033551760442 9.29109749989708,51.7032225576424 9.29055786672822,51.7038856457642 9.29102306773586,51.7039144754621</coordinates></LinearRing></outerBoundaryIs></Polygon></MultiGeometry>
+  </Placemark>
+  <Placemark id="_all_restrictions_Culture.3">
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#_all_restrictions_Culture">
+		<SimpleData name="fc_w_id">75</SimpleData>
+		<SimpleData name="id">41895</SimpleData>
+		<SimpleData name="label">denkmal</SimpleData>
+	</SchemaData></ExtendedData>
+      <MultiGeometry><Polygon><outerBoundaryIs><LinearRing><coordinates>9.35095026153862,51.7368836192006 9.35172249521128,51.7367971930917 9.35166667109036,51.7357946381483 9.35131311832457,51.7356736386337 9.35131311832457,51.7350052545253 9.34896850524612,51.7358119237668 9.3492848419313,51.7362440620803 9.35010359570473,51.7364860577309 9.3503455002287,51.7368029548374 9.35095026153862,51.7368836192006</coordinates></LinearRing></outerBoundaryIs></Polygon></MultiGeometry>
+  </Placemark>
+</Folder>
+</Document></kml>

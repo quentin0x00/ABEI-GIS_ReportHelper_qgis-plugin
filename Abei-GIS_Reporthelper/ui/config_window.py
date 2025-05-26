@@ -42,10 +42,16 @@ class ConfigEditorDialog(QDialog):
         self._create_fc_fields(fc_layout)
         self._create_dc_fields(dc_layout)
 
-        # Label "quentin" qui renvoie un mail
-        mail_label = QLabel('contact: <a href="mailto:quentinrouquette@abeienergy.com">Quentin Rouquette</a>')
-        mail_label.setOpenExternalLinks(True)
-        layout.addWidget(mail_label, alignment=Qt.AlignLeft)
+        teams_url = (
+            "https://teams.microsoft.com/l/chat/0/0"
+            "?users=quentinrouquette@abeienergy.com"
+            "&message=[QGIS-Plugin]"
+        )
+        teams_label = QLabel(
+            f'Contact: <a href="{teams_url}">Quentin (Teams)</a>'
+        )
+        teams_label.setOpenExternalLinks(True)
+        layout.addWidget(teams_label, alignment=Qt.AlignLeft)
 
         # Boutons
         button_box = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
@@ -80,18 +86,6 @@ class ConfigEditorDialog(QDialog):
         self.fc_type_restri_edit = QLineEdit()
         form_layout.addRow("Type Restriction Strict:", self.fc_type_restri_edit)
 
-        # Ajouter les thèmes FC
-        fc_themes_group = QGroupBox("FC Themes")
-        fc_themes_layout = QFormLayout()
-        fc_themes_group.setLayout(fc_themes_layout)
-        container_layout.addWidget(fc_themes_group)
-
-        self.fc_theme_edits = {}
-        for key, value in Config.FC_THEMES_DICT.items():
-            edit = QLineEdit()
-            edit.setText(value)
-            fc_themes_layout.addRow(f"Theme {key}:", edit)
-            self.fc_theme_edits[key] = edit
 
         # Ajouter les configurations FC
         fc_config_group = QGroupBox("FC Configurations")
@@ -124,6 +118,19 @@ class ConfigEditorDialog(QDialog):
                     group_layout.addRow(f"{field}:", edit)
                     tech_edits[field] = edit
             self.fc_config_edits[tech_code] = tech_edits
+        
+        # Ajouter les thèmes FC
+        fc_themes_group = QGroupBox("FC Themes")
+        fc_themes_layout = QFormLayout()
+        fc_themes_group.setLayout(fc_themes_layout)
+        container_layout.addWidget(fc_themes_group)
+
+        self.fc_theme_edits = {}
+        for key, value in Config.FC_FILTER_VALUES.items():
+            edit = QLineEdit()
+            edit.setText(value)
+            fc_themes_layout.addRow(f"Theme {key}:", edit)
+            self.fc_theme_edits[key] = edit
 
         scroll_area.setWidget(container)
         layout.addWidget(scroll_area)
@@ -154,19 +161,6 @@ class ConfigEditorDialog(QDialog):
 
         self.dc_type_restri_edit = QLineEdit()
         form_layout.addRow("Type Restriction Strict:", self.dc_type_restri_edit)
-
-        # Ajouter les thèmes DC
-        dc_themes_group = QGroupBox("DC Themes")
-        dc_themes_layout = QFormLayout()
-        dc_themes_group.setLayout(dc_themes_layout)
-        container_layout.addWidget(dc_themes_group)
-
-        self.dc_theme_edits = {}
-        for key, value in Config.DC_THEMES_DICT.items():
-            edit = QLineEdit()
-            edit.setText(value)
-            dc_themes_layout.addRow(f"Theme {key}:", edit)
-            self.dc_theme_edits[key] = edit
 
         # Ajouter les configurations DC
         dc_config_group = QGroupBox("DC Configurations")
@@ -199,6 +193,19 @@ class ConfigEditorDialog(QDialog):
                     group_layout.addRow(f"{field}:", edit)
                     tech_edits[field] = edit
             self.dc_config_edits[tech_code] = tech_edits
+
+        # Ajouter les thèmes DC
+        dc_themes_group = QGroupBox("DC Themes")
+        dc_themes_layout = QFormLayout()
+        dc_themes_group.setLayout(dc_themes_layout)
+        container_layout.addWidget(dc_themes_group)
+
+        self.dc_theme_edits = {}
+        for key, value in Config.DC_FILTER_VALUES.items():
+            edit = QLineEdit()
+            edit.setText(value)
+            dc_themes_layout.addRow(f"Theme {key}:", edit)
+            self.dc_theme_edits[key] = edit
 
         scroll_area.setWidget(container)
         layout.addWidget(scroll_area)
@@ -253,11 +260,11 @@ class ConfigEditorDialog(QDialog):
 
         # Charger les thèmes FC
         for key, edit in self.fc_theme_edits.items():
-            edit.setText(Config.FC_THEMES_DICT.get(key, ""))
+            edit.setText(Config.DC_FILTER_VALUES.get(key, ""))
 
         # Charger les thèmes DC
         for key, edit in self.dc_theme_edits.items():
-            edit.setText(Config.DC_THEMES_DICT.get(key, ""))
+            edit.setText(Config.DC_FILTER_VALUES.get(key, ""))
 
     def _populate_layer_combo(self, combo_box, default_value=None):
         """Remplit un QComboBox avec les noms des couches du projet et sélectionne la valeur par défaut"""
@@ -311,11 +318,11 @@ class ConfigEditorDialog(QDialog):
 
             # Thèmes FC
             for key, edit in self.fc_theme_edits.items():
-                Config.FC_THEMES_DICT[key] = edit.text()
+                Config.FC_FILTER_VALUES[key] = edit.text()
 
             # Thèmes DC
             for key, edit in self.dc_theme_edits.items():
-                Config.DC_THEMES_DICT[key] = edit.text()
+                Config.DC_FILTER_VALUES[key] = edit.text()
 
             # Config FC
             for tech, edits in self.fc_config_edits.items():
