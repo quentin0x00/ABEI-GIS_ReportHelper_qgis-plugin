@@ -141,7 +141,7 @@ class ReportGenerator:
         row_cells = table.add_row().cells
 
         # Use the stored label_field
-        unique_labels = sorted(set(f[self.label_field] for f in feats if self.label_field in f.fields()))
+        unique_labels = sorted(set(f[Config.get_label_field()] for f in feats))
         row_cells[0].text = "\n".join(f"• {label}" for label in unique_labels)
 
         theme_str = str(feats[0]['theme']).strip()
@@ -167,12 +167,12 @@ class ReportGenerator:
 
     def _add_individual_theme_content(self, table, feats):
         """
-        Ajoute une ligne par entité (label) du thème dans le tableau.
+        Ajoute une ligne par label dans le tableau.
         """
-        # Use the stored label_field
-        labels = sorted(set(f[self.label_field] for f in feats if self.label_field in f.fields()))
-        
-        for label in labels:
+        # On groupe d'abord par label
+       
+        # On trie les labels par ordre alphabétique
+        for label in sorted(set(f[Config.get_label_field()] for f in feats)):
             row_cells = table.add_row().cells
             row_cells[0].text = label
 
@@ -180,16 +180,15 @@ class ReportGenerator:
                 temp_img_path = temp_file.name
 
             subset = (f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' '
-                     f'AND "type_restriction" = \'{self.type_restri_strict}\' '
-                     f'AND "{self.label_field}" = \'{label.replace("'", "''")}\'')
-
-            self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
-
+                    f'AND \"type_restriction\" = \'{self.type_restri_strict}\' '
+                    f'AND label = \'{label.replace("'", "''")}\'')
+            
             try:
+                self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
                 row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(3.5))
             except Exception as e:
-                row_cells[1].text = f"Image error: {label}"
-                QgsMessageLog.logMessage(f"Error loading image: {str(e)}", "ABEI GIS", Qgis.Warning)
+                row_cells[1].text = f"Image error: {str(e)}"
+                QgsMessageLog.logMessage(f"Error exporting image for label {label}: {str(e)}", "ABEI GIS", Qgis.Warning)
             finally:
                 try:
                     os.remove(temp_img_path)
@@ -221,14 +220,19 @@ class ReportGenerator:
 
         doc.add_heading("GIS analysis - grouped restrictions by theme", level=1)
         for theme_value, feats in grouped_by_theme.items():
-            # CHANGEMENT ICI: On utilise get_theme_display_name pour les titres
             display_name = Config.get_display_name(theme_value)
-            self._add_theme_section(doc, display_name, feats, grouped=True)
+            # Ajout du nombre de restrictions dans le titre
+            title = f"{display_name} - {len(feats)} restriction(s)"
+            self._add_theme_section(doc, title, feats, grouped=True)
+    
             
-        doc.add_heading("GIS analysis - individual restriction by theme", level=1)
+        # Section Individual
+        doc.add_heading("GIS analysis - individual restriction by label", level=1)
         for theme_value, feats in grouped_by_theme.items():
             display_name = Config.get_display_name(theme_value)
+            # On passe grouped=False pour avoir une ligne par label
             self._add_theme_section(doc, display_name, feats, grouped=False)
+        
 
         doc_path = os.path.join(self.report_directory, f"[Vmap-Report]{Config.get_analyse_type()}{self.layer_manager.analysis_data['technology']}={self.layer_manager.analysis_label}.docx")
         doc.save(doc_path)

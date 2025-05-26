@@ -120,17 +120,26 @@ class ConfigEditorDialog(QDialog):
             self.fc_config_edits[tech_code] = tech_edits
         
         # Ajouter les thèmes FC
-        fc_themes_group = QGroupBox("FC Themes")
+        fc_themes_group = QGroupBox("FC Themes (Key: Display Name => Filter Value)")
         fc_themes_layout = QFormLayout()
         fc_themes_group.setLayout(fc_themes_layout)
         container_layout.addWidget(fc_themes_group)
 
         self.fc_theme_edits = {}
-        for key, value in Config.FC_FILTER_VALUES.items():
-            edit = QLineEdit()
-            edit.setText(value)
-            fc_themes_layout.addRow(f"Theme {key}:", edit)
-            self.fc_theme_edits[key] = edit
+        # Afficher les thèmes exactement comme dans FC_THEMES_DICT
+        for display_name, filter_value in Config.FC_FILTER_VALUES.items():
+            hbox = QHBoxLayout()
+            
+            display_label = QLabel(display_name)
+            arrow_label = QLabel("=>")
+            value_edit = QLineEdit(filter_value)
+            
+            hbox.addWidget(display_label)
+            hbox.addWidget(arrow_label)
+            hbox.addWidget(value_edit)
+            
+            fc_themes_layout.addRow(hbox)
+            self.fc_theme_edits[display_name] = value_edit
 
         scroll_area.setWidget(container)
         layout.addWidget(scroll_area)
@@ -195,17 +204,27 @@ class ConfigEditorDialog(QDialog):
             self.dc_config_edits[tech_code] = tech_edits
 
         # Ajouter les thèmes DC
-        dc_themes_group = QGroupBox("DC Themes")
+        dc_themes_group = QGroupBox("DC Themes (Key: Display Name => Filter Value)")
         dc_themes_layout = QFormLayout()
         dc_themes_group.setLayout(dc_themes_layout)
         container_layout.addWidget(dc_themes_group)
 
         self.dc_theme_edits = {}
-        for key, value in Config.DC_FILTER_VALUES.items():
-            edit = QLineEdit()
-            edit.setText(value)
-            dc_themes_layout.addRow(f"Theme {key}:", edit)
-            self.dc_theme_edits[key] = edit
+        # Afficher les thèmes exactement comme dans DC_THEMES_DICT
+        for display_name, filter_value in Config.DC_FILTER_VALUES.items():
+            hbox = QHBoxLayout()
+            
+            display_label = QLabel(display_name)
+            arrow_label = QLabel("=>")
+            value_edit = QLineEdit(filter_value)
+            
+            hbox.addWidget(display_label)
+            hbox.addWidget(arrow_label)
+            hbox.addWidget(value_edit)
+            
+            dc_themes_layout.addRow(hbox)
+            self.dc_theme_edits[display_name] = value_edit
+
 
         scroll_area.setWidget(container)
         layout.addWidget(scroll_area)
@@ -259,12 +278,16 @@ class ConfigEditorDialog(QDialog):
         self.dc_type_restri_edit.setText(Config.DC_TYPE_RESTRI_STRICT)
 
         # Charger les thèmes FC
-        for key, edit in self.fc_theme_edits.items():
-            edit.setText(Config.DC_FILTER_VALUES.get(key, ""))
+        for display_name, edit in self.fc_theme_edits.items():
+            # Trouver la clé correspondante dans FC_FILTER_VALUES
+            filter_value = Config.FC_FILTER_VALUES.get(display_name, "")
+            edit.setText(filter_value)
 
         # Charger les thèmes DC
-        for key, edit in self.dc_theme_edits.items():
-            edit.setText(Config.DC_FILTER_VALUES.get(key, ""))
+        for display_name, edit in self.dc_theme_edits.items():
+            # Trouver la clé correspondante dans DC_FILTER_VALUES
+            filter_value = Config.DC_FILTER_VALUES.get(display_name, "")
+            edit.setText(filter_value)
 
     def _populate_layer_combo(self, combo_box, default_value=None):
         """Remplit un QComboBox avec les noms des couches du projet et sélectionne la valeur par défaut"""
@@ -317,12 +340,12 @@ class ConfigEditorDialog(QDialog):
             Config.DC_TYPE_RESTRI_STRICT = self.dc_type_restri_edit.text()
 
             # Thèmes FC
-            for key, edit in self.fc_theme_edits.items():
-                Config.FC_FILTER_VALUES[key] = edit.text()
+            for display_name, edit in self.fc_theme_edits.items():
+                Config.FC_FILTER_VALUES[display_name] = edit.text()
 
             # Thèmes DC
-            for key, edit in self.dc_theme_edits.items():
-                Config.DC_FILTER_VALUES[key] = edit.text()
+            for display_name, edit in self.dc_theme_edits.items():
+                Config.DC_FILTER_VALUES[display_name] = edit.text()
 
             # Config FC
             for tech, edits in self.fc_config_edits.items():
@@ -353,6 +376,7 @@ class ConfigEditorDialog(QDialog):
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save configuration: {str(e)}")
+
 
 # from ..config import *
 
