@@ -95,7 +95,7 @@ class ConfigEditorDialog(QDialog):
         self.fc_type_restri_edit = QLineEdit()
         base_layout.addRow("Type Restriction Strict:", self.fc_type_restri_edit)
         
-        main_tab.addTab(base_tab, "Paramètres généraux")
+        main_tab.addTab(base_tab, "General")
 
         # Onglet Configurations par technologie
         config_tab = QWidget()
@@ -123,7 +123,7 @@ class ConfigEditorDialog(QDialog):
             tab_name = tech_config.get('technology', f'Tech {tech_code}')
             tech_tabs.addTab(tech_tab, tab_name)
         
-        main_tab.addTab(config_tab, "Configurations techniques")
+        main_tab.addTab(config_tab, "Layers")
 
         # Onglet Thèmes
         themes_tab = QWidget()
@@ -140,7 +140,7 @@ class ConfigEditorDialog(QDialog):
         self.fc_theme_table.setMinimumHeight(min(30 + row_count * 30, 600))  # 30px par ligne + marge
         
         themes_layout.addWidget(self.fc_theme_table)
-        main_tab.addTab(themes_tab, "Thèmes FC")
+        main_tab.addTab(themes_tab, "Themes")
 
     def _create_dc_fields(self, layout):
         """Crée les champs DC avec la même structure en onglets"""
@@ -167,7 +167,7 @@ class ConfigEditorDialog(QDialog):
         self.dc_type_restri_edit = QLineEdit()
         base_layout.addRow("Type Restriction Strict:", self.dc_type_restri_edit)
         
-        main_tab.addTab(base_tab, "Paramètres généraux")
+        main_tab.addTab(base_tab, "General")
 
         # Onglet Configurations par technologie
         config_tab = QWidget()
@@ -195,7 +195,7 @@ class ConfigEditorDialog(QDialog):
             tab_name = tech_config.get('technology', f'Tech {tech_code}')
             tech_tabs.addTab(tech_tab, tab_name)
         
-        main_tab.addTab(config_tab, "Configurations techniques")
+        main_tab.addTab(config_tab, "Layers")
 
         # Onglet Thèmes
         themes_tab = QWidget()
@@ -212,7 +212,7 @@ class ConfigEditorDialog(QDialog):
         self.dc_theme_table.setMinimumHeight(min(30 + row_count * 30, 600))  # 30px par ligne + marge
         
         themes_layout.addWidget(self.dc_theme_table)
-        main_tab.addTab(themes_tab, "Thèmes DC")
+        main_tab.addTab(themes_tab, "Themes")
         
     def _create_general_fields(self, layout):
         """Crée les champs pour les constantes générales avec menu déroulant pour le basemap"""
