@@ -58,22 +58,8 @@ class PluginController:
         except Exception as e:
             QMessageBox.critical(self.widget, "Error", f"Error during KML export:\n{str(e)}")
             QgsMessageLog.logMessage(f"KML export error: {str(e)}", "FC Report", Qgis.Critical)
-
+            
     def generate_report(self):
-        """
-        Interface du plugin. Créé le rapport Word.
-
-        Étapes :
-        1. Vérifie la sélection (analyse + technologie)
-        2. Récupère la bonne couche via un motif
-        3. Demande un répertoire de sortie
-        4. Instancie le gestionnaire de couches (LayerManager)
-        5. Regroupe les entités par thème (via Config)
-        6. Crée le rapport Word avec images et données
-        7. Supprime les couches temporaires
-
-        Affiche un message d’erreur en cas de problème, avec infos utiles.
-        """
         try:
             if not self.widget.selected_analysis:
                 raise ValueError("No object selected")
@@ -96,9 +82,15 @@ class PluginController:
             layer = matching_layers[0]
             iface.setActiveLayer(layer)
 
-            # 3. Get ID and label directly as in the action script
-            analysis_id = self.widget.selected_analysis[Config.get_id_field()]
-            analysis_label = self.widget.selected_analysis['label'] if 'label' in self.widget.selected_analysis.fields().names() else f"id_{analysis_id}"
+            # 3. Get ID and label - with proper field existence checks
+            id_field = Config.get_id_field()
+            label_field = Config.get_label_field()
+            
+            if id_field not in self.widget.selected_analysis.fields().names():
+                raise ValueError(f"ID field '{id_field}' not found in selected feature")
+                
+            analysis_id = self.widget.selected_analysis[id_field]
+            analysis_label = self.widget.selected_analysis[label_field] if label_field in self.widget.selected_analysis.fields().names() else f"id_{analysis_id}"
 
             # 4. Ask for output directory
             output_dir = QFileDialog.getExistingDirectory(
@@ -106,12 +98,16 @@ class PluginController:
                 "Select Output Directory",
                 os.path.expanduser("~")
             )
-
             if not output_dir:
                 return
 
-            # 5. Initialize managers
-            layer_manager = LayerManager(layer.name(), analysis_id, analysis_label)
+            # 5. Initialize LayerManager with the config
+            layer_manager = LayerManager(
+                layer_name=layer.name(),
+                analysis_id=analysis_id,
+                analysis_label=analysis_label,
+                config=config
+            )
             layer_manager.setup_layers()
 
             # 6. Group features
@@ -121,7 +117,7 @@ class PluginController:
             for f in features:
                 theme_raw = f['theme']
                 theme_str = str(theme_raw).strip()
-                theme_name = Config.THEMES_DICT.get(theme_str, "Unknown") if theme_str.isdigit() else theme_str or "Unknown"
+                theme_name = Config.get_theme_name(theme_str)
                 grouped_by_theme[theme_name].append(f)
 
             # 7. Generate report
@@ -135,17 +131,17 @@ class PluginController:
             QMessageBox.information(
                 self.widget,
                 "Success",
-                f"Report generated"
+                f"Report generated: {report_path}"
             )
 
         except Exception as e:
             error_msg = f"""Error generating report:
             {str(e)}
 
-            Available fields in layer:
-            {self.widget.selected_analysis.fields().names() if hasattr(self.widget, 'selected_analysis') and self.widget.selected_analysis else 'No object selected'}
+            Selected analysis fields: {self.widget.selected_analysis.fields().names() if hasattr(self.widget, 'selected_analysis') and self.widget.selected_analysis else 'No object selected'}
 
-            Expected configuration:
-            {config}"""  # <-- Utilisez directement la config déjà récupérée
+            Config ID field: {Config.get_id_field()}
+            Config label field: {Config.get_label_field()}
+            Current mode: {Config.CURRENT_MODE}"""
 
             QMessageBox.critical(self.widget, "Critical Error", error_msg)

@@ -4,14 +4,22 @@ from ..config import Config
 class LayerManager:
     """Gère les opérations sur les couches QGIS."""
 
-    def __init__(self, layer_name, analysis_id, analysis_label):
+    def __init__(self, layer_name, analysis_id, analysis_label, config=None):
         """
         Initialise le gestionnaire de couches.
         """
         self.analysis_id = analysis_id
         self.analysis_label = analysis_label
+        self.selected_technology = None
+        self.analysis_data = config if config else {}
         self.source_layer = QgsProject.instance().mapLayersByName(layer_name)[0]
-        self._determine_technology()
+        
+        # Store field names for consistent access
+        self.id_field = Config.get_id_field()
+        self.label_field = Config.get_label_field()
+        
+        if config is None:
+            self._determine_technology()
 
     def _determine_technology(self):
         """
@@ -19,8 +27,7 @@ class LayerManager:
         """
         if self.source_layer:
             layer_name = self.source_layer.name()
-            current_mode = 'FC' if Config.CURRENT_MODE == 'FC' else 'DC'
-            config_dict = Config.FC_CONFIG if current_mode == 'FC' else Config.DC_CONFIG
+            config_dict = Config.FC_CONFIG if Config.CURRENT_MODE == 'FC' else Config.DC_CONFIG
             
             for technology, config in config_dict.items():
                 if re.search(config['global_area_layer'], layer_name):
@@ -37,9 +44,8 @@ class LayerManager:
         """
         self.source_layer.select([])
         
-        # Utilisation des méthodes get_*
-        id_field = Config.get_id_field()
-        request = QgsFeatureRequest().setFilterExpression(f'"{id_field}" = {self.analysis_id}')
+        # Use the stored id_field
+        request = QgsFeatureRequest().setFilterExpression(f'"{self.id_field}" = {self.analysis_id}')
         feature = next(self.source_layer.getFeatures(request))
         self.analysis_extent = feature.geometry().boundingBox()
 
@@ -47,42 +53,26 @@ class LayerManager:
         self.feasible_layer = QgsProject.instance().mapLayersByName(self.analysis_data['feasible_layer'])[0] if QgsProject.instance().mapLayersByName(self.analysis_data['feasible_layer']) else None
         self.restriction_layer = QgsProject.instance().mapLayersByName(self.analysis_data['restriction_layer'])[0]
         
-        self.area_layer.setSubsetString(f'"{id_field}" = {self.analysis_id}')
+        self.area_layer.setSubsetString(f'"{self.id_field}" = {self.analysis_id}')
         if self.feasible_layer:
-            self.feasible_layer.setSubsetString(f'"{id_field}" = {self.analysis_id}')
-
-    # def get_restriction_features(self):
-    #     """
-    #     Récupère les entités de restrictions en utilisant get_restri_id().
-    #     """
-    #     restri_id_field = Config.get_restri_id()  # 'id' pour FC, 'as_id' pour DC
-    #     type_restri = Config.get_type_restri_strict()  # '1' ou 'Restriction'
-        
-    #     request = QgsFeatureRequest().setFilterExpression(
-    #         f'"{restri_id_field}" = \'{self.analysis_id}\' '
-    #         f'AND "type_restriction" = \'{type_restri}\''
-    #     )
-    #     features = list(self.restriction_layer.getFeatures(request))
-
-    #     if not features:
-    #         raise Exception(
-    #             f"No restrictions found for {restri_id_field}={self.analysis_id} "
-    #             f"and type_restriction={type_restri}"
-    #         )
-    #     return features
+            self.feasible_layer.setSubsetString(f'"{self.id_field}" = {self.analysis_id}')
 
     def get_restriction_features(self):
         """
         Récupère les entités de restrictions.
         """
+        # Use the restri_join_id_field from the config
         request = QgsFeatureRequest().setFilterExpression(
-            f"{self.analysis_data['id_field']} = '{self.analysis_id}' "
-            f"AND type_restriction = {Config.get_type_restri_strict()}"
+            f'"{self.analysis_data["restri_join_id_field"]}" = \'{self.analysis_id}\' '
+            f'AND "type_restriction" = \'{Config.get_type_restri_strict()}\''
         )
         features = list(self.restriction_layer.getFeatures(request))
 
         if not features:
-            raise Exception(f"No restrictions found for analysis_id = {self.analysis_id}")
+            raise Exception(
+                f"No restrictions found for {self.analysis_data['restri_join_id_field']}={self.analysis_id} "
+                f"and type_restriction={Config.get_type_restri_strict()}"
+            )
         return features
 
     def cleanup(self):

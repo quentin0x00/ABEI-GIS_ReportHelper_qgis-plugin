@@ -157,7 +157,7 @@ class KMLEXporter:
             grouped_by_label[f["label"]].append(f)
             theme_raw = f['theme']
             theme_str = str(theme_raw).strip()
-            theme_name = Config.THEMES_DICT.get(theme_str, "Unknown") if theme_str.isdigit() else theme_str or "Unknown"
+            theme_name = Config.get_theme_name(theme_str) if theme_str.isdigit() else theme_str or "Unknown"
             grouped_by_theme[theme_name].append(f)
 
         # Export all restrictions by theme
@@ -174,7 +174,7 @@ class KMLEXporter:
         for label, feats in grouped_by_label.items():
             theme_raw = feats[0]['theme']
             theme_str = str(theme_raw).strip()
-            theme_name = Config.THEMES_DICT.get(theme_str, "Unknown") if theme_str.isdigit() else theme_str or "Unknown"
+            theme_name = Config.get_theme_name(theme_str) if theme_str.isdigit() else theme_str or "Unknown"
             safelabel = label.replace(" ", "").replace("/", "").replace("\\", "").replace(".","")
 
             theme_directory = os.path.join(output_dir, "detailed-restrictions", theme_name)
