@@ -5,6 +5,7 @@ import tempfile
 from collections import defaultdict
 from datetime import datetime
 
+
 from qgis.core import (
     QgsProject, QgsFeatureRequest, QgsRectangle,
     QgsMapSettings, QgsMapRendererSequentialJob,
@@ -18,23 +19,17 @@ from qgis.PyQt.QtCore import (
     QCoreApplication, QSettings, QVariant, Qt
 )
 from qgis.PyQt.QtGui import (
-    QIcon, QPixmap, QColor, QImage, QPainter, QFont
+    QIcon, QPixmap, QColor, QImage, QPainter, QFont, QCursor
 )
 from qgis.PyQt.QtWidgets import (
     QAction, QFileDialog, QMessageBox, QDialog,
     QVBoxLayout, QLabel, QComboBox, QPushButton,
     QListWidget, QAbstractItemView, QHBoxLayout,
-    QDockWidget, QWidget, QFrame, QLineEdit, QRadioButton, QTabWidget,     QDialogButtonBox,
-    QFormLayout,
-    QScrollArea,
-    QGroupBox,
-    QWidget,
-    QVBoxLayout,
-    QLabel,
-    QPushButton,
-    QLineEdit,
-    QTabWidget,
+    QDockWidget, QWidget, QFrame, QLineEdit, QRadioButton, QTabWidget,
+    QDialogButtonBox, QFormLayout, QScrollArea, QGroupBox,
+    QTableWidget, QHeaderView, QTableWidgetItem, QSizePolicy
 )
+
 from qgis.utils import iface
 from qgis.gui import QgsMapToolIdentifyFeature, QgsDockWidget
 
