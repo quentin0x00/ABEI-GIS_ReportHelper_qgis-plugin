@@ -113,7 +113,7 @@ class ConfigEditorDialog(QDialog):
             
             tech_edits = {}
             for field, value in tech_config.items():
-                if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
+                if field in ['global_area_layer', 'feasible_layer', 'conditional_layer', 'restriction_layer']:
                     combo = QComboBox()
                     self._populate_layer_combo(combo, value)
                     tech_layout.addRow(f"{field}:", combo)
@@ -185,7 +185,7 @@ class ConfigEditorDialog(QDialog):
             
             tech_edits = {}
             for field, value in tech_config.items():
-                if field in ['global_area_layer', 'feasible_layer', 'restriction_layer']:
+                if field in ['global_area_layer', 'feasible_layer', 'conditional_layer', 'restriction_layer']:
                     combo = QComboBox()
                     self._populate_layer_combo(combo, value)
                     tech_layout.addRow(f"{field}:", combo)

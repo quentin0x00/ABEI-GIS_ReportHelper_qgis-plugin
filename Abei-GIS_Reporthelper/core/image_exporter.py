@@ -36,6 +36,7 @@ class ImageExporter:
         visible_layers = [
             self.layer_manager.restriction_layer,
             self.layer_manager.area_layer,
+            self.layer_manager.conditional_layer if self.layer_manager.conditional_layer else None,
             self.layer_manager.feasible_layer if self.layer_manager.feasible_layer else None,
             QgsProject.instance().mapLayersByName(Config.BASEMAP)[0]
         ]

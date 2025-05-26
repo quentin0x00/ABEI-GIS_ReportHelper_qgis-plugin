@@ -130,6 +130,34 @@ class KMLEXporter:
 
         if error[0] != QgsVectorFileWriter.NoError:
             raise Exception(f"Error exporting feasible area: {error[1]}")
+        
+    @staticmethod
+    def export_conditional_area_kml(config, analysis_id, output_dir):
+        """
+        Exporte la zone faisable en fichier KML.
+
+        :param config: La configuration contenant les informations de la couche faisable.
+        :param analysis_id: L'ID de la fonctionnalité.
+        :param output_dir: Le répertoire de sortie pour les fichiers KML.
+        """
+        conditional_layer = QgsProject.instance().mapLayersByName(config['conditional_layer'])
+        if not conditional_layer:
+            return
+
+        conditional_layer = conditional_layer[0]
+        request = QgsFeatureRequest().setFilterExpression(f"{Config.get_id_field()} = {analysis_id}")
+        features = list(conditional_layer.getFeatures(request))
+
+        if not features:
+            return
+
+        output_path = os.path.join(output_dir, f"Conditional-area.kml")
+        error = KMLEXporter.export_kml(features, output_path,
+                     fields_to_export=Config.get_kml_feasible_fields(),
+                     layer_name="conditional_area")
+
+        if error[0] != QgsVectorFileWriter.NoError:
+            raise Exception(f"Error exporting conditional area: {error[1]}")
 
     @staticmethod
     def export_restrictions_kml(config, analysis_id, output_dir):

@@ -47,6 +47,7 @@ class PluginController:
 
             KMLEXporter.export_source_area_kml(layer, analysis_id, analysis_label, parent_directory)
             KMLEXporter.export_feasible_area_kml(config, analysis_id, parent_directory)
+            KMLEXporter.export_conditional_area_kml(config, analysis_id, parent_directory)
             KMLEXporter.export_restrictions_kml(config, analysis_id, parent_directory)
 
             QMessageBox.information(

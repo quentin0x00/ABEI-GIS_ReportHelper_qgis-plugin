@@ -50,12 +50,15 @@ class LayerManager:
         self.analysis_extent = feature.geometry().boundingBox()
 
         self.area_layer = self.source_layer
+        self.conditional_layer = QgsProject.instance().mapLayersByName(self.analysis_data['conditional_layer'])[0] if QgsProject.instance().mapLayersByName(self.analysis_data['conditional_layer']) else None
         self.feasible_layer = QgsProject.instance().mapLayersByName(self.analysis_data['feasible_layer'])[0] if QgsProject.instance().mapLayersByName(self.analysis_data['feasible_layer']) else None
         self.restriction_layer = QgsProject.instance().mapLayersByName(self.analysis_data['restriction_layer'])[0]
         
         self.area_layer.setSubsetString(f'"{self.id_field}" = {self.analysis_id}')
         if self.feasible_layer:
             self.feasible_layer.setSubsetString(f'"{self.id_field}" = {self.analysis_id}')
+        if self.conditional_layer:
+            self.conditional_layer.setSubsetString(f'"{self.id_field}" = {self.analysis_id}')
 
     def get_restriction_features(self):
         """
@@ -84,3 +87,5 @@ class LayerManager:
         self.area_layer.setSubsetString("")
         if self.feasible_layer:
             self.feasible_layer.setSubsetString("")
+        if self.conditional_layer:
+            self.conditional_layer.setSubsetString("")
