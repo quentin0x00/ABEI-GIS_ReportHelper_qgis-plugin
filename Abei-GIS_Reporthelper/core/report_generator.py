@@ -133,6 +133,45 @@ class ReportGenerator:
             self._add_individual_theme_content(table, feats)
 
         doc.add_paragraph()
+        
+    def _add_global_feasible_restriction_map(self, doc):
+        """Aperçu dans un tableau sans paramètre obsolète"""
+        doc.add_heading("Analysis overview", level=2)
+        
+        # Tableau ajusté (total 5.5")
+        table = doc.add_table(rows=1, cols=2)
+        table.style = 'Table Grid'
+        table.columns[0].width = Inches(1.0)  # Colonne Notes
+        table.columns[1].width = Inches(4.5)  # Colonne Capture
+
+        # En-têtes
+        hdr_cells = table.rows[0].cells
+        hdr_cells[0].text = 'Notes'
+        hdr_cells[1].text = 'Capture'
+
+        # Contenu
+        row_cells = table.add_row().cells
+        row_cells[0].text = ''  # Cellule vide
+
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+            temp_img_path = temp_file.name
+        
+        subset = f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' AND "type_restriction" = \'{self.type_restri_strict}\''
+
+        try:
+            # Appel SIMPLIFIÉ sans paramètre
+            self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
+            
+            # Image à 4.3" pour rester dans la marge
+            row_cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(4.3))
+        except Exception as e:
+            row_cells[1].text = f"Erreur : {str(e)}"
+            QgsMessageLog.logMessage(f"Erreur export image : {str(e)}", "ABEI GIS", Qgis.Warning)
+        finally:
+            try: os.remove(temp_img_path)
+            except: pass
+        doc.add_paragraph()  # Espace après le tableau
 
     def _add_grouped_theme_content(self, table, feats):
         """
@@ -216,6 +255,7 @@ class ReportGenerator:
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         self._add_general_info(doc)
+        self._add_global_feasible_restriction_map(doc)
         doc.add_paragraph()
 
         doc.add_heading("GIS analysis - grouped restrictions by theme", level=1)

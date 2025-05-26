@@ -81,19 +81,19 @@ class ConfigEditorDialog(QDialog):
         base_tab.setLayout(base_layout)
         
         self.fc_word_title_edit = QLineEdit()
-        base_layout.addRow("Word Title:", self.fc_word_title_edit)
+        base_layout.addRow("Word report - Title:", self.fc_word_title_edit)
 
         self.fc_id_field_edit = QLineEdit()
-        base_layout.addRow("ID Field:", self.fc_id_field_edit)
+        base_layout.addRow("FC Area - ID Field:", self.fc_id_field_edit)
+        
+        self.fc_label_field_edit = QLineEdit()
+        base_layout.addRow("FC Area - Label Field:", self.fc_label_field_edit)
 
         self.fc_restri_id_edit = QLineEdit()
-        base_layout.addRow("Restriction ID:", self.fc_restri_id_edit)
-
-        self.fc_label_field_edit = QLineEdit()
-        base_layout.addRow("Label Field:", self.fc_label_field_edit)
+        base_layout.addRow("Strict Restriction - ID Field:", self.fc_restri_id_edit)
 
         self.fc_type_restri_edit = QLineEdit()
-        base_layout.addRow("Type Restriction Strict:", self.fc_type_restri_edit)
+        base_layout.addRow("Strict Restriction - Value:", self.fc_type_restri_edit)
         
         main_tab.addTab(base_tab, "General")
 
@@ -153,19 +153,19 @@ class ConfigEditorDialog(QDialog):
         base_tab.setLayout(base_layout)
         
         self.dc_word_title_edit = QLineEdit()
-        base_layout.addRow("Word Title:", self.dc_word_title_edit)
+        base_layout.addRow("Word report - Title:", self.dc_word_title_edit)
 
         self.dc_id_field_edit = QLineEdit()
-        base_layout.addRow("ID Field:", self.dc_id_field_edit)
+        base_layout.addRow("DC Area - ID Field:", self.dc_id_field_edit)
+        
+        self.dc_label_field_edit = QLineEdit()
+        base_layout.addRow("DC Area - Label Field:", self.dc_label_field_edit)
 
         self.dc_restri_id_edit = QLineEdit()
-        base_layout.addRow("Restriction ID:", self.dc_restri_id_edit)
-
-        self.dc_label_field_edit = QLineEdit()
-        base_layout.addRow("Label Field:", self.dc_label_field_edit)
+        base_layout.addRow("Strict Restriction - ID Field:", self.dc_restri_id_edit)
 
         self.dc_type_restri_edit = QLineEdit()
-        base_layout.addRow("Type Restriction Strict:", self.dc_type_restri_edit)
+        base_layout.addRow("Strict Restriction - Value:", self.dc_type_restri_edit)
         
         main_tab.addTab(base_tab, "General")
 
@@ -226,16 +226,13 @@ class ConfigEditorDialog(QDialog):
         form_layout = QFormLayout()
         container_layout.addLayout(form_layout)
 
-        self.plugin_name_edit = QLineEdit()
-        form_layout.addRow("Plugin Name:", self.plugin_name_edit)
-
         self.footer_text_edit = QLineEdit()
-        form_layout.addRow("Footer Text:", self.footer_text_edit)
+        form_layout.addRow("Word report - Footer Text:", self.footer_text_edit)
 
         # Menu déroulant pour le basemap
         self.basemap_combo = QComboBox()
         self._populate_layer_combo(self.basemap_combo, Config.BASEMAP)
-        form_layout.addRow("Basemap:", self.basemap_combo)
+        form_layout.addRow("Word report - Basemap:", self.basemap_combo)
 
         scroll_area.setWidget(container)
         layout.addWidget(scroll_area)
