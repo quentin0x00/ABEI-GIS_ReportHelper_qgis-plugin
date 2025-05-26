@@ -239,7 +239,6 @@ class ConfigEditorDialog(QDialog):
 
     def _load_config_values(self):
         """Charge les valeurs actuelles dans les champs"""
-        self.plugin_name_edit.setText(Config.PLUGIN_NAME)
         self.footer_text_edit.setText(Config.FOOTER_MIDDLE_TEXT)
         index = self.basemap_combo.findText(Config.BASEMAP)
         if index >= 0:
@@ -303,7 +302,6 @@ class ConfigEditorDialog(QDialog):
         """Sauvegarde les modifications dans le fichier de configuration"""
         try:
             # Constantes générales
-            Config.PLUGIN_NAME = self.plugin_name_edit.text()
             Config.FOOTER_MIDDLE_TEXT = self.footer_text_edit.text()
             Config.BASEMAP = self.basemap_combo.currentData() or self.basemap_combo.currentText()
 
