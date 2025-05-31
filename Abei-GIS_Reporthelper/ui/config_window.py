@@ -299,52 +299,62 @@ class ConfigEditorDialog(QDialog):
                 combo_box.setCurrentIndex(combo_box.count() - 1)
 
     def _save_config(self):
-        """Sauvegarde les modifications dans le fichier de configuration"""
+        """Sauvegarde les modifications dans le fichier JSON et recharge la config"""
         try:
-            # Constantes générales
-            Config.FOOTER_MIDDLE_TEXT = self.footer_text_edit.text()
-            Config.BASEMAP = self.basemap_combo.currentData() or self.basemap_combo.currentText()
-
+            # 1. Charger la config existante
+            with open(Config._config_path, 'r', encoding='utf-8') as f:
+                config_data = json.load(f)
+            
+            # Mettre à jour les valeurs
+            # Global
+            config_data['global']['FOOTER_MIDDLE_TEXT'] = self.footer_text_edit.text()
+            config_data['global']['BASEMAP'] = self.basemap_combo.currentData() or self.basemap_combo.currentText()
+            
             # FC
-            Config.FC_WORD_TITLE_TEXT = self.fc_word_title_edit.text()
-            Config.FC_ID_FIELD = self.fc_id_field_edit.text()
-            Config.FC_RESTRI_ID = self.fc_restri_id_edit.text()
-            Config.FC_LABEL_FIELD = self.fc_label_field_edit.text()
-            Config.FC_TYPE_RESTRI_STRICT = self.fc_type_restri_edit.text()
-
+            config_data['FC']['FC_WORD_TITLE_TEXT'] = self.fc_word_title_edit.text()
+            config_data['FC']['FC_ID_FIELD'] = self.fc_id_field_edit.text()
+            config_data['FC']['FC_RESTRI_ID'] = self.fc_restri_id_edit.text()
+            config_data['FC']['FC_LABEL_FIELD'] = self.fc_label_field_edit.text()
+            config_data['FC']['FC_TYPE_RESTRI_STRICT'] = self.fc_type_restri_edit.text()
+            
             # DC
-            Config.DC_WORD_TITLE_TEXT = self.dc_word_title_edit.text()
-            Config.DC_ID_FIELD = self.dc_id_field_edit.text()
-            Config.DC_RESTRI_ID = self.dc_restri_id_edit.text()
-            Config.DC_LABEL_FIELD = self.dc_label_field_edit.text()
-            Config.DC_TYPE_RESTRI_STRICT = self.dc_type_restri_edit.text()
-
+            config_data['DC']['DC_WORD_TITLE_TEXT'] = self.dc_word_title_edit.text()
+            config_data['DC']['DC_ID_FIELD'] = self.dc_id_field_edit.text()
+            config_data['DC']['DC_RESTRI_ID'] = self.dc_restri_id_edit.text()
+            config_data['DC']['DC_LABEL_FIELD'] = self.dc_label_field_edit.text()
+            config_data['DC']['DC_TYPE_RESTRI_STRICT'] = self.dc_type_restri_edit.text()
+            
             # Thèmes FC
-            Config.FC_FILTER_VALUES.clear()
+            config_data['FC']['FC_FILTER_VALUES'] = {}
             for row in range(self.fc_theme_table.rowCount()):
                 display_name = self.fc_theme_table.item(row, 0).text()
                 filter_value = self.fc_theme_table.item(row, 1).text()
-                Config.FC_FILTER_VALUES[display_name] = filter_value
-
+                config_data['FC']['FC_FILTER_VALUES'][display_name] = filter_value
+            
             # Thèmes DC
-            Config.DC_FILTER_VALUES.clear()
+            config_data['DC']['DC_FILTER_VALUES'] = {}
             for row in range(self.dc_theme_table.rowCount()):
                 display_name = self.dc_theme_table.item(row, 0).text()
                 filter_value = self.dc_theme_table.item(row, 1).text()
-                Config.DC_FILTER_VALUES[display_name] = filter_value
-
+                config_data['DC']['DC_FILTER_VALUES'][display_name] = filter_value
+            
             # Config FC
             for tech, edits in self.fc_config_edits.items():
                 for field, widget in edits.items():
-                    Config.FC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
-
+                    config_data['FC']['FC_CONFIG'][tech][field] = widget.currentData() or widget.currentText()
+            
             # Config DC
             for tech, edits in self.dc_config_edits.items():
                 for field, widget in edits.items():
-                    Config.DC_CONFIG[tech][field] = widget.currentData() or widget.currentText()
-
-            QMessageBox.information(self, "Success", "Configuration updated successfully!")
+                    config_data['DC']['DC_CONFIG'][tech][field] = widget.currentData() or widget.currentText()
+            
+            with open(Config._config_path, 'w', encoding='utf-8') as f:
+                json.dump(config_data, f, indent=2, ensure_ascii=False)
+            
+            Config._load_config()
+            
+            QMessageBox.information(self, "Success", "Configuration saved")
             self.accept()
-
+            
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to save configuration: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Error saving config: {str(e)}")

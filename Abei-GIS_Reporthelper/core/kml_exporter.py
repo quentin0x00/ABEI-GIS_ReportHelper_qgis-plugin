@@ -6,22 +6,21 @@ class KMLEXporter:
 
     @staticmethod
     def export_kml(features, output_path, fields_to_export=None, layer_name="temp_kml_layer"):
-        """
-        Exporte des entités en fichier KML.
-
-        :param features: Liste des entités à exporter.
-        :param output_path: Chemin de sortie pour le fichier KML.
-        :param fields_to_export: Dictionnaire des champs à exporter (nom du champ et type).
-        :param layer_name: Nom de la couche temporaire pour l'export.
-        :return: Erreur de l'opération d'exportation, le cas échéant.
-        """
         if not features:
             return
 
         fields = QgsFields()
         if fields_to_export:
             for field_name, field_type in fields_to_export.items():
-                fields.append(QgsField(field_name, field_type))
+                # Conversion des types depuis le JSON
+                if field_type == "QVariant.Int":
+                    qtype = QVariant.Int
+                elif field_type == "QVariant.String":
+                    qtype = QVariant.String
+                else:  # Par défaut
+                    qtype = QVariant.String
+                    
+                fields.append(QgsField(field_name, qtype))
 
         crs = QgsCoordinateReferenceSystem("EPSG:3857")
         mem_layer = QgsVectorLayer(f"Polygon?crs={crs.authid()}", layer_name, "memory")
