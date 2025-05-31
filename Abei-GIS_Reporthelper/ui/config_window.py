@@ -14,7 +14,7 @@ class ConfigEditorDialog(QDialog):
     def _init_ui(self):
         layout = QVBoxLayout()
         self.setLayout(layout)
-
+            
         # Onglets pour organiser les différentes sections
         self.tab_widget = QTabWidget()
         layout.addWidget(self.tab_widget)
@@ -56,13 +56,68 @@ class ConfigEditorDialog(QDialog):
         teams_label.setCursor(QCursor(Qt.PointingHandCursor))
         layout.addWidget(teams_label, alignment=Qt.AlignLeft)
 
-        # Boutons
+        # Boutons en bas (annuler/enregistrer)
         button_box = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
         button_box.accepted.connect(self._save_config)
         button_box.rejected.connect(self.reject)
-        layout.addWidget(button_box)
 
+        # Créer le bouton load JSON (comme votre settings_btn)
+        self.load_json_btn = QPushButton()
+        self.load_json_btn.setIcon(QgsApplication.getThemeIcon("/processingResult.svg"))
+        self.load_json_btn.setToolTip("Load JSON configuration")
+        self.load_json_btn.setFixedSize(28, 28)
+        self.load_json_btn.setStyleSheet("""
+            QPushButton {
+                border: none;
+                background: transparent;
+                padding: 0;
+            }
+            QPushButton:hover {
+                background-color: #e0e0e0;
+            }
+        """)
+        self.load_json_btn.clicked.connect(self._load_json_file)
 
+        # Layout pour les boutons en bas
+        bottom_layout = QHBoxLayout()
+        bottom_layout.addWidget(self.load_json_btn)  # Icône à gauche
+        bottom_layout.addStretch()  # Espace entre les boutons
+        bottom_layout.addWidget(button_box)  # Boutons standard à droite
+
+        # Ajouter le layout de boutons au layout principal
+        layout.addLayout(bottom_layout)
+
+    def _load_json_file(self):
+        """Charge un fichier JSON et remplace complètement la config"""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, 
+            "Select JSON Configuration", 
+            "", 
+            "JSON Files (*.json)"
+        )
+        
+        if not file_path:
+            return
+        
+        try:
+            # 1. Lire le nouveau fichier JSON
+            with open(file_path, 'r', encoding='utf-8') as f:
+                new_config = json.load(f)
+            
+            # 2. Écraser param.json
+            with open(Config._config_path, 'w', encoding='utf-8') as f:
+                json.dump(new_config, f, indent=2)
+            
+            # 3. Recharger la config
+            Config._load_config()
+            
+            # 4. Rafraîchir l'UI
+            self._load_config_values()
+            
+            QMessageBox.information(self, "Success", "Configuration loaded and applied!")
+        
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load config: {str(e)}")
 
     def _open_teams_link(self, link):
         try:
