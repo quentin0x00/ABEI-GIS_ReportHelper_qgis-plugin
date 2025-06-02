@@ -41,13 +41,18 @@ class ConfigEditorDialog(QDialog):
         self._create_settings_fields(settings_layout)
 
         # Hyperlien Teams (msteams protocol)
-        teams_link = (
+        teams_link_q = (
             "msteams:/l/chat/0/0"
             "?users=quentinrouquette@abeienergy.com"
             "&message=HELP!!😰"
         )
+        teams_link_a = (
+            "msteams:/l/chat/0/0"
+            "?users=alexandrehervouet@abeienergy.com"
+            "&message=HELP!!😰"
+        )
         teams_label = QLabel(
-            f'Contact: <a href="{teams_link}">Quentin (Teams)</a>'
+            f'Contact: <a href="{teams_link_q}">Quentin (Teams)</a> | <a href="{teams_link_a}">Alexandre (Teams)</a> '
         )
         teams_label.setOpenExternalLinks(False)  # we'll handle it manually
         teams_label.linkActivated.connect(self._open_teams_link)
