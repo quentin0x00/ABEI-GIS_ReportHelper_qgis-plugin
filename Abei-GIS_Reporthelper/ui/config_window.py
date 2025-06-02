@@ -2,12 +2,10 @@ from ..config import *
 
 class ConfigEditorDialog(QDialog):
     """Boîte de dialogue pour éditer les constantes de configuration"""
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Configuration Editor")
         self.setMinimumSize(800, 600)
-
         self._init_ui()
         self._load_config_values()
 
@@ -15,38 +13,38 @@ class ConfigEditorDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
             
-        # Onglets pour organiser les différentes sections
+        # Onglets principaux reorganisés
         self.tab_widget = QTabWidget()
         layout.addWidget(self.tab_widget)
 
-        # Onglet Général
-        general_tab = QWidget()
-        general_layout = QVBoxLayout()
-        general_tab.setLayout(general_layout)
-        self.tab_widget.addTab(general_tab, "General")
+        # Onglet 1: Word Report (le plus important pour les utilisateurs)
+        word_report_tab = QWidget()
+        word_report_layout = QVBoxLayout()
+        word_report_tab.setLayout(word_report_layout)
+        self.tab_widget.addTab(word_report_tab, "Word Report")
 
-        # Onglet FC
-        fc_tab = QWidget()
-        fc_layout = QVBoxLayout()
-        fc_tab.setLayout(fc_layout)
-        self.tab_widget.addTab(fc_tab, "First Check")
+        # Onglet 2: Layers (le deuxième plus important)
+        layers_tab = QWidget()
+        layers_layout = QVBoxLayout()
+        layers_tab.setLayout(layers_layout)
+        self.tab_widget.addTab(layers_tab, "Layers")
 
-        # Onglet DC
-        dc_tab = QWidget()
-        dc_layout = QVBoxLayout()
-        dc_tab.setLayout(dc_layout)
-        self.tab_widget.addTab(dc_tab, "Double Check")
+        # Onglet 3: Settings (moins fréquemment utilisé)
+        settings_tab = QWidget()
+        settings_layout = QVBoxLayout()
+        settings_tab.setLayout(settings_layout)
+        self.tab_widget.addTab(settings_tab, "Settings")
 
-        # Création des champs pour chaque section
-        self._create_general_fields(general_layout)
-        self._create_fc_fields(fc_layout)
-        self._create_dc_fields(dc_layout)
+        # Création du contenu pour chaque onglet
+        self._create_word_report_fields(word_report_layout)
+        self._create_layers_fields(layers_layout)
+        self._create_settings_fields(settings_layout)
 
         # Hyperlien Teams (msteams protocol)
         teams_link = (
             "msteams:/l/chat/0/0"
             "?users=quentinrouquette@abeienergy.com"
-            "&message=[QGIS-Plugin]"
+            "&message=HELP!!😰"
         )
         teams_label = QLabel(
             f'Contact: <a href="{teams_link}">Quentin (Teams)</a>'
@@ -62,6 +60,16 @@ class ConfigEditorDialog(QDialog):
         button_box.rejected.connect(self.reject)
 
         # Créer le bouton load JSON (comme votre settings_btn)
+        load_json_container = QWidget()
+        load_json_layout = QHBoxLayout()
+        load_json_container.setLayout(load_json_layout)
+        load_json_layout.setContentsMargins(0, 0, 0, 0)  # Supprimer les marges
+
+        # Ajouter le texte à gauche
+        load_json_label = QLabel("Load JSON:")
+        load_json_layout.addWidget(load_json_label)
+
+        # Garder votre bouton existant (inchangé)
         self.load_json_btn = QPushButton()
         self.load_json_btn.setIcon(QgsApplication.getThemeIcon("/processingResult.svg"))
         self.load_json_btn.setToolTip("Load JSON configuration")
@@ -77,15 +85,218 @@ class ConfigEditorDialog(QDialog):
             }
         """)
         self.load_json_btn.clicked.connect(self._load_json_file)
-
+        load_json_layout.addWidget(self.load_json_btn)
+        
         # Layout pour les boutons en bas
         bottom_layout = QHBoxLayout()
-        bottom_layout.addWidget(self.load_json_btn)  # Icône à gauche
+        bottom_layout.addWidget(load_json_container)    # Icône à gauche
         bottom_layout.addStretch()  # Espace entre les boutons
         bottom_layout.addWidget(button_box)  # Boutons standard à droite
 
         # Ajouter le layout de boutons au layout principal
         layout.addLayout(bottom_layout)
+        
+    def _create_word_report_fields(self, layout):
+        """Onglet Word Report - Contient tout ce qui concerne les rapports Word"""
+        
+        # Créer un conteneur vertical pour les éléments généraux + onglets
+        container = QVBoxLayout()
+        
+        # Ajouter les éléments généraux en premier
+        general_form = QFormLayout()
+        self.basemap_combo = QComboBox()
+        self._populate_layer_combo(self.basemap_combo, Config.BASEMAP)
+        general_form.addRow("Basemap:", self.basemap_combo)
+        
+        self.footer_text_edit = QLineEdit()
+        general_form.addRow("Footer Text:", self.footer_text_edit)
+        general_form.addRow(QLabel(""))
+        container.addLayout(general_form)
+        
+        # Sous-onglets pour FC et DC (inchangé)
+        word_tabs = QTabWidget()
+        container.addWidget(word_tabs)
+
+        # Onglet FC Word Report (inchangé)
+        fc_word_tab = QWidget()
+        fc_word_layout = QVBoxLayout()
+        fc_word_tab.setLayout(fc_word_layout)
+        word_tabs.addTab(fc_word_tab, "First Check")
+
+        # Paramètres FC Word Report (inchangé)
+        fc_form = QFormLayout()
+        self.fc_word_title_edit = QLineEdit()
+        fc_form.addRow("Title:", self.fc_word_title_edit)
+        fc_word_layout.addLayout(fc_form)
+
+        # Onglet DC Word Report (inchangé)
+        dc_word_tab = QWidget()
+        dc_word_layout = QVBoxLayout()
+        dc_word_tab.setLayout(dc_word_layout)
+        word_tabs.addTab(dc_word_tab, "Double Check")
+
+        # Paramètres DC Word Report (inchangé)
+        dc_form = QFormLayout()
+        self.dc_word_title_edit = QLineEdit()
+        dc_form.addRow("Title:", self.dc_word_title_edit)
+        dc_word_layout.addLayout(dc_form)
+        
+        # Ajouter le conteneur au layout principal
+        layout.addLayout(container)
+
+    def _create_layers_fields(self, layout):
+        """Onglet Layers - Contient toutes les configurations de couches par technologie"""
+        # Sous-onglets pour FC et DC
+        layers_tabs = QTabWidget()
+        layout.addWidget(layers_tabs)
+
+        # Onglet FC Layers
+        fc_layers_tab = QWidget()
+        fc_layers_layout = QVBoxLayout()
+        fc_layers_tab.setLayout(fc_layers_layout)
+        layers_tabs.addTab(fc_layers_tab, "First Check Layers")
+
+        # Configurations FC par technologie
+        fc_tech_tabs = QTabWidget()
+        fc_layers_layout.addWidget(fc_tech_tabs)
+        
+        self.fc_config_edits = {}
+        for tech_code, tech_config in Config.FC_CONFIG.items():
+            tech_tab = QWidget()
+            tech_layout = QFormLayout()
+            tech_tab.setLayout(tech_layout)
+            
+            tech_edits = {}
+            for field, value in tech_config.items():
+                if field in ['global_area_layer', 'feasible_layer', 'conditional_layer', 'restriction_layer']:
+                    combo = QComboBox()
+                    self._populate_layer_combo(combo, value)
+                    tech_layout.addRow(f"{field}:", combo)
+                    tech_edits[field] = combo
+            
+            self.fc_config_edits[tech_code] = tech_edits
+            tab_name = tech_config.get('technology', f'Tech {tech_code}')
+            fc_tech_tabs.addTab(tech_tab, tab_name)
+
+        # Onglet DC Layers
+        dc_layers_tab = QWidget()
+        dc_layers_layout = QVBoxLayout()
+        dc_layers_tab.setLayout(dc_layers_layout)
+        layers_tabs.addTab(dc_layers_tab, "Double Check Layers")
+
+        # Configurations DC par technologie
+        dc_tech_tabs = QTabWidget()
+        dc_layers_layout.addWidget(dc_tech_tabs)
+        
+        self.dc_config_edits = {}
+        for tech_code, tech_config in Config.DC_CONFIG.items():
+            tech_tab = QWidget()
+            tech_layout = QFormLayout()
+            tech_tab.setLayout(tech_layout)
+            
+            tech_edits = {}
+            for field, value in tech_config.items():
+                if field in ['global_area_layer', 'feasible_layer', 'conditional_layer', 'restriction_layer']:
+                    combo = QComboBox()
+                    self._populate_layer_combo(combo, value)
+                    tech_layout.addRow(f"{field}:", combo)
+                    tech_edits[field] = combo
+            
+            self.dc_config_edits[tech_code] = tech_edits
+            tab_name = tech_config.get('technology', f'Tech {tech_code}')
+            dc_tech_tabs.addTab(tech_tab, tab_name)
+
+    def _create_settings_fields(self, layout):
+        """Onglet Settings - Contient les paramètres moins fréquemment modifiés"""
+        # Sous-onglets pour FC et DC
+        settings_tabs = QTabWidget()
+        layout.addWidget(settings_tabs)
+
+        # Onglet FC Settings
+        fc_settings_tab = QWidget()
+        fc_settings_scroll = QScrollArea()
+        fc_settings_scroll.setWidgetResizable(True)
+        fc_settings_container = QWidget()
+        fc_settings_layout = QFormLayout()
+        fc_settings_container.setLayout(fc_settings_layout)
+        fc_settings_scroll.setWidget(fc_settings_container)
+        
+        fc_settings_tab_layout = QVBoxLayout()
+        fc_settings_tab_layout.addWidget(fc_settings_scroll)
+        fc_settings_tab.setLayout(fc_settings_tab_layout)
+        settings_tabs.addTab(fc_settings_tab, "First Check Settings")
+
+        # Paramètres FC avancés
+        self.fc_id_field_edit = QLineEdit()
+        fc_settings_layout.addRow("FC Area - ID Field:", self.fc_id_field_edit)
+        
+        self.fc_label_field_edit = QLineEdit()
+        fc_settings_layout.addRow("FC Area - Label Field:", self.fc_label_field_edit)
+        
+        self.fc_restri_id_edit = QLineEdit()
+        fc_settings_layout.addRow("Strict Restriction - ID Field:", self.fc_restri_id_edit)
+        
+        self.fc_type_restri_edit = QLineEdit()
+        fc_settings_layout.addRow("Strict Restriction - Value:", self.fc_type_restri_edit)
+
+        # Thèmes FC dans Settings
+        fc_settings_layout.addRow(QLabel(""))  # Espacement
+        fc_settings_layout.addRow(QLabel("Themes:"))
+        
+        self.fc_theme_table = QTableWidget(len(Config.FC_FILTER_VALUES), 2)
+        self.fc_theme_table.setHorizontalHeaderLabels(["Display Name", "Filter Value"])
+        self.fc_theme_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.fc_theme_table.verticalHeader().setVisible(False)
+        
+        # Adapter la hauteur du tableau pour qu'il soit scrollable
+        row_count = len(Config.FC_FILTER_VALUES)
+        self.fc_theme_table.setMinimumHeight(200)  # Hauteur fixe plus petite
+        self.fc_theme_table.setMaximumHeight(300)  # Hauteur maximale pour permettre le scroll
+        
+        fc_settings_layout.addRow(self.fc_theme_table)
+
+        # Onglet DC Settings
+        dc_settings_tab = QWidget()
+        dc_settings_scroll = QScrollArea()
+        dc_settings_scroll.setWidgetResizable(True)
+        dc_settings_container = QWidget()
+        dc_settings_layout = QFormLayout()
+        dc_settings_container.setLayout(dc_settings_layout)
+        dc_settings_scroll.setWidget(dc_settings_container)
+        
+        dc_settings_tab_layout = QVBoxLayout()
+        dc_settings_tab_layout.addWidget(dc_settings_scroll)
+        dc_settings_tab.setLayout(dc_settings_tab_layout)
+        settings_tabs.addTab(dc_settings_tab, "Double Check Settings")
+
+        # Paramètres DC avancés
+        self.dc_id_field_edit = QLineEdit()
+        dc_settings_layout.addRow("DC Area - ID Field:", self.dc_id_field_edit)
+        
+        self.dc_label_field_edit = QLineEdit()
+        dc_settings_layout.addRow("DC Area - Label Field:", self.dc_label_field_edit)
+        
+        self.dc_restri_id_edit = QLineEdit()
+        dc_settings_layout.addRow("Strict Restriction - ID Field:", self.dc_restri_id_edit)
+        
+        self.dc_type_restri_edit = QLineEdit()
+        dc_settings_layout.addRow("Strict Restriction - Value:", self.dc_type_restri_edit)
+
+        # Thèmes DC dans Settings
+        dc_settings_layout.addRow(QLabel(""))  # Espacement
+        dc_settings_layout.addRow(QLabel("Themes:"))
+        
+        self.dc_theme_table = QTableWidget(len(Config.DC_FILTER_VALUES), 2)
+        self.dc_theme_table.setHorizontalHeaderLabels(["Display Name", "Filter Value"])
+        self.dc_theme_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.dc_theme_table.verticalHeader().setVisible(False)
+        
+        # Adapter la hauteur du tableau pour qu'il soit scrollable
+        row_count = len(Config.DC_FILTER_VALUES)
+        self.dc_theme_table.setMinimumHeight(200)  # Hauteur fixe plus petite
+        self.dc_theme_table.setMaximumHeight(300)  # Hauteur maximale pour permettre le scroll
+        
+        dc_settings_layout.addRow(self.dc_theme_table)
 
     def _load_json_file(self):
         """Charge un fichier JSON et remplace complètement la config"""
@@ -124,173 +335,6 @@ class ConfigEditorDialog(QDialog):
             os.startfile(link)
         except Exception as e:
             print(f"Erreur à l'ouverture de Teams : {e}")
-            
-    def _create_fc_fields(self, layout):
-        """Crée les champs FC avec onglets et tableaux complets"""
-        main_tab = QTabWidget()
-        layout.addWidget(main_tab)
-
-        # Onglet Paramètres de base
-        base_tab = QWidget()
-        base_layout = QFormLayout()
-        base_tab.setLayout(base_layout)
-        
-        self.fc_word_title_edit = QLineEdit()
-        base_layout.addRow("Word report - Title:", self.fc_word_title_edit)
-
-        self.fc_id_field_edit = QLineEdit()
-        base_layout.addRow("FC Area - ID Field:", self.fc_id_field_edit)
-        
-        self.fc_label_field_edit = QLineEdit()
-        base_layout.addRow("FC Area - Label Field:", self.fc_label_field_edit)
-
-        self.fc_restri_id_edit = QLineEdit()
-        base_layout.addRow("Strict Restriction - ID Field:", self.fc_restri_id_edit)
-
-        self.fc_type_restri_edit = QLineEdit()
-        base_layout.addRow("Strict Restriction - Value:", self.fc_type_restri_edit)
-        
-        main_tab.addTab(base_tab, "General")
-
-        # Onglet Configurations par technologie
-        config_tab = QWidget()
-        config_layout = QVBoxLayout()
-        config_tab.setLayout(config_layout)
-        
-        tech_tabs = QTabWidget()
-        config_layout.addWidget(tech_tabs)
-        
-        self.fc_config_edits = {}
-        for tech_code, tech_config in Config.FC_CONFIG.items():
-            tech_tab = QWidget()
-            tech_layout = QFormLayout()
-            tech_tab.setLayout(tech_layout)
-            
-            tech_edits = {}
-            for field, value in tech_config.items():
-                if field in ['global_area_layer', 'feasible_layer', 'conditional_layer', 'restriction_layer']:
-                    combo = QComboBox()
-                    self._populate_layer_combo(combo, value)
-                    tech_layout.addRow(f"{field}:", combo)
-                    tech_edits[field] = combo
-            
-            self.fc_config_edits[tech_code] = tech_edits
-            tab_name = tech_config.get('technology', f'Tech {tech_code}')
-            tech_tabs.addTab(tech_tab, tab_name)
-        
-        main_tab.addTab(config_tab, "Layers")
-
-        # Onglet Thèmes
-        themes_tab = QWidget()
-        themes_layout = QVBoxLayout()
-        themes_tab.setLayout(themes_layout)
-        
-        self.fc_theme_table = QTableWidget(len(Config.FC_FILTER_VALUES), 2)
-        self.fc_theme_table.setHorizontalHeaderLabels(["Display Name", "Filter Value"])
-        self.fc_theme_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.fc_theme_table.verticalHeader().setVisible(False)
-        
-        # Adapter la hauteur du tableau
-        row_count = len(Config.FC_FILTER_VALUES)
-        self.fc_theme_table.setMinimumHeight(min(30 + row_count * 30, 600))  # 30px par ligne + marge
-        
-        themes_layout.addWidget(self.fc_theme_table)
-        main_tab.addTab(themes_tab, "Themes")
-
-    def _create_dc_fields(self, layout):
-        """Crée les champs DC avec la même structure en onglets"""
-        main_tab = QTabWidget()
-        layout.addWidget(main_tab)
-
-        # Onglet Paramètres de base
-        base_tab = QWidget()
-        base_layout = QFormLayout()
-        base_tab.setLayout(base_layout)
-        
-        self.dc_word_title_edit = QLineEdit()
-        base_layout.addRow("Word report - Title:", self.dc_word_title_edit)
-
-        self.dc_id_field_edit = QLineEdit()
-        base_layout.addRow("DC Area - ID Field:", self.dc_id_field_edit)
-        
-        self.dc_label_field_edit = QLineEdit()
-        base_layout.addRow("DC Area - Label Field:", self.dc_label_field_edit)
-
-        self.dc_restri_id_edit = QLineEdit()
-        base_layout.addRow("Strict Restriction - ID Field:", self.dc_restri_id_edit)
-
-        self.dc_type_restri_edit = QLineEdit()
-        base_layout.addRow("Strict Restriction - Value:", self.dc_type_restri_edit)
-        
-        main_tab.addTab(base_tab, "General")
-
-        # Onglet Configurations par technologie
-        config_tab = QWidget()
-        config_layout = QVBoxLayout()
-        config_tab.setLayout(config_layout)
-        
-        tech_tabs = QTabWidget()
-        config_layout.addWidget(tech_tabs)
-        
-        self.dc_config_edits = {}
-        for tech_code, tech_config in Config.DC_CONFIG.items():
-            tech_tab = QWidget()
-            tech_layout = QFormLayout()
-            tech_tab.setLayout(tech_layout)
-            
-            tech_edits = {}
-            for field, value in tech_config.items():
-                if field in ['global_area_layer', 'feasible_layer', 'conditional_layer', 'restriction_layer']:
-                    combo = QComboBox()
-                    self._populate_layer_combo(combo, value)
-                    tech_layout.addRow(f"{field}:", combo)
-                    tech_edits[field] = combo
-            
-            self.dc_config_edits[tech_code] = tech_edits
-            tab_name = tech_config.get('technology', f'Tech {tech_code}')
-            tech_tabs.addTab(tech_tab, tab_name)
-        
-        main_tab.addTab(config_tab, "Layers")
-
-        # Onglet Thèmes
-        themes_tab = QWidget()
-        themes_layout = QVBoxLayout()
-        themes_tab.setLayout(themes_layout)
-        
-        self.dc_theme_table = QTableWidget(len(Config.DC_FILTER_VALUES), 2)
-        self.dc_theme_table.setHorizontalHeaderLabels(["Display Name", "Filter Value"])
-        self.dc_theme_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.dc_theme_table.verticalHeader().setVisible(False)
-        
-        # Adapter la hauteur du tableau
-        row_count = len(Config.DC_FILTER_VALUES)
-        self.dc_theme_table.setMinimumHeight(min(30 + row_count * 30, 600))  # 30px par ligne + marge
-        
-        themes_layout.addWidget(self.dc_theme_table)
-        main_tab.addTab(themes_tab, "Themes")
-        
-    def _create_general_fields(self, layout):
-        """Crée les champs pour les constantes générales avec menu déroulant pour le basemap"""
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-
-        container = QWidget()
-        container_layout = QVBoxLayout()
-        container.setLayout(container_layout)
-
-        form_layout = QFormLayout()
-        container_layout.addLayout(form_layout)
-
-        self.footer_text_edit = QLineEdit()
-        form_layout.addRow("Word report - Footer Text:", self.footer_text_edit)
-
-        # Menu déroulant pour le basemap
-        self.basemap_combo = QComboBox()
-        self._populate_layer_combo(self.basemap_combo, Config.BASEMAP)
-        form_layout.addRow("Word report - Basemap:", self.basemap_combo)
-
-        scroll_area.setWidget(container)
-        layout.addWidget(scroll_area)
 
     def _load_config_values(self):
         """Charge les valeurs actuelles dans les champs"""
@@ -328,21 +372,20 @@ class ConfigEditorDialog(QDialog):
     def _populate_layer_combo(self, combo_box, default_value=None):
         """Remplit un QComboBox avec les noms des couches du projet et sélectionne la valeur par défaut"""
         combo_box.clear()
-
         # Ajouter une entrée vide optionnelle
         combo_box.addItem("", None)
-
+        
         # Récupérer toutes les couches du projet
         layers = QgsProject.instance().mapLayers().values()
         layer_names = [layer.name() for layer in layers]
-
+        
         # Trier les noms par ordre alphabétique
         layer_names.sort()
-
+        
         # Ajouter les noms au combo box
         for name in layer_names:
             combo_box.addItem(name, name)
-
+        
         # Sélectionner la valeur par défaut si elle existe
         if default_value:
             index = combo_box.findText(default_value)
