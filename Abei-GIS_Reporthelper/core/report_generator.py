@@ -156,7 +156,8 @@ class ReportGenerator:
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
             temp_img_path = temp_file.name
         
-        subset = f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' AND "type_restriction" = \'{self.type_restri_strict}\''
+        # subset = f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' AND "type_restriction" = \'{self.type_restri_strict}\''
+        subset = 'null'
 
         try:
             # Appel SIMPLIFIÉ sans paramètre

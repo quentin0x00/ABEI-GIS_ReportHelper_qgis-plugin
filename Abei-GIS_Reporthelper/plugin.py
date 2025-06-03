@@ -107,7 +107,19 @@ class FCReportGeneratorPlugin:
                 self.tr('&[Abei GIS] Report helper'),
                 action)
             self.iface.removeToolBarIcon(action)
-        del self.toolbar
+            
+        if hasattr(self, 'dock_widget'):
+            self.iface.removeDockWidget(self.dock_widget)
+            self.dock_widget.setParent(None)
+            self.dock_widget.deleteLater()
+            del self.dock_widget
+
+        if hasattr(self, 'translator'):
+            QCoreApplication.removeTranslator(self.translator)
+            del self.translator
+
+        if hasattr(self, 'toolbar'):
+            del self.toolbar
 
     def run(self):
         """
