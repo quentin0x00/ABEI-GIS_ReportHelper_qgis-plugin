@@ -56,47 +56,47 @@
                 "global_area_layer": "FC Area - Solar",
                 "feasible_layer": "FC Feasible area with conditional - Solar",
                 "conditional_layer": "FC Conditional area - Solar",
-                "restriction_layer": "FC Strict restrictions - Solar",
+                "restriction_layer": "FC Strict restriction - Solar",
                 "restri_join_id_field": "fc_s_id",
                 "technology": "Solar"
             },
             "w": {
                 "global_area_layer": "FC Area - Wind",
-                "feasible_layer": "FC Feasible area - Wind",
+                "feasible_layer": "FC Feasible area with conditional - Wind",
                 "conditional_layer": "FC Conditional area - Wind",
-                "restriction_layer": "FC Strict restrictions - Wind",
+                "restriction_layer": "FC Strict restriction - Wind",
                 "restri_join_id_field": "fc_w_id",
                 "technology": "Wind"
             },
             "b": {
                 "global_area_layer": "FC Area - Bess",
-                "feasible_layer": "FC Feasible area - Bess",
+                "feasible_layer": "FC Feasible area with conditional - Bess",
                 "conditional_layer": "FC Conditional area - Bess",
-                "restriction_layer": "FC Strict restrictions - Bess",
+                "restriction_layer": "FC Strict restriction - Bess",
                 "restri_join_id_field": "fc_b_id",
                 "technology": "Bess"
             },
             "h": {
-                "global_area_layer": "FC Area - Hydrogen",
-                "feasible_layer": "FC Feasible area - Hydrogen",
+                "global_area_layer": "FC Area - H2",
+                "feasible_layer": "FC Feasible area with conditional - H2",
                 "conditional_layer": "FC Conditional area - H2",
-                "restriction_layer": "FC Strict restrictions - Hydrogen",
+                "restriction_layer": "FC Strict restriction - H2",
                 "restri_join_id_field": "fc_h_id",
                 "technology": "Hydrogen"
             },
             "d": {
                 "global_area_layer": "FC Area - Datacenter",
-                "feasible_layer": "FC Feasible area - Datacenter",
+                "feasible_layer": "FC Feasible area with conditional - Datacenter",
                 "conditional_layer": "FC Conditional area - Datacenter",
-                "restriction_layer": "FC Strict restrictions - Datacenter",
+                "restriction_layer": "FC Strict restriction - Datacenter",
                 "restri_join_id_field": "fc_d_id",
                 "technology": "Datacenter"
             },
             "bm": {
-                "global_area_layer": "FC Area - Biomethan",
-                "feasible_layer": "FC Feasible area - Biomethan",
-                "conditional_layer": "FC Conditional area - Biomethan",
-                "restriction_layer": "FC Strict restrictionss - Biomethan",
+                "global_area_layer": "FC Area - Biomethane",
+                "feasible_layer": "FC Feasible area with conditional - Biomethane",
+                "conditional_layer": "FC Conditional area - Biomethane",
+                "restriction_layer": "FC Strict restriction - Biomethane",
                 "restri_join_id_field": "fc_bm_id",
                 "technology": "Biomethan"
             }
@@ -159,10 +159,10 @@
                 "technology": "Bess"
             },
             "h": {
-                "global_area_layer": "DC Area - Hydrogen",
-                "feasible_layer": "DC Feasible area - Hydrogen",
+                "global_area_layer": "DC Area - H2",
+                "feasible_layer": "DC Feasible area - H2",
                 "conditional_layer": "DC Conditional area - H2",
-                "restriction_layer": "DC Strict restrictions - Hydrogen",
+                "restriction_layer": "DC Strict restrictions - H2",
                 "restri_join_id_field": "fid_dc",
                 "technology": "Hydrogen"
             },
@@ -175,10 +175,10 @@
                 "technology": "Datacenter"
             },
             "bm": {
-                "global_area_layer": "DC Area - Biomethan",
-                "feasible_layer": "DC Feasible area - Biomethan",
-                "conditional_layer": "DC Conditional area - Biomethan",
-                "restriction_layer": "DC Strict restrictions - Biomethan",
+                "global_area_layer": "DC Area - Biomethane",
+                "feasible_layer": "DC Feasible area - Biomethane",
+                "conditional_layer": "DC Conditional area - Biomethane",
+                "restriction_layer": "DC Strict restrictions - Biomethane",
                 "restri_join_id_field": "fid_dc",
                 "technology": "Biomethan"
             }

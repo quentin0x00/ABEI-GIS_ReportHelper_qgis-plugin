@@ -329,8 +329,10 @@ class ConfigEditorDialog(QDialog):
             
             # 4. Rafraîchir l'UI
             self._load_config_values()
-            
+                        
             QMessageBox.information(self, "Success", "Configuration loaded and applied!")
+            # Fermer la fenêtre après le chargement
+            self.accept()
         
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to load config: {str(e)}")
