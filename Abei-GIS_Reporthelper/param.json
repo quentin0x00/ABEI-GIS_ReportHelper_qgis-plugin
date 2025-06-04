@@ -1,187 +1,187 @@
 {
-    "global": {
-        "PLUGIN_NAME": "Abei GIS Report Helper",
-        "FOOTER_MIDDLE_TEXT": "ENVIRONMENTAL AND URBAN PLANNING ANALYSIS",
-        "BASEMAP": "OSM Standard",
-        "THEME_DISPLAY": {
-            "1": "Administration",
-            "2": "Culture",
-            "3": "Energy Infrastructure",
-            "4": "Energy Renewable",
-            "5": "Environment",
-            "6": "Hydrography",
-            "7": "Landuse",
-            "8": "Military",
-            "9": "Oil and Gas",
-            "10": "Point of Interest",
-            "11": "Risk",
-            "12": "Transportation",
-            "13": "Urban"
-        }
-    },
-    "FC": {
-        "FC_ANALYSE_TYPE": "FirstCheck",
-        "FC_WORD_TITLE_TEXT": "First Check - GIS report [Vmap]",
-        "FC_ID_FIELD": "id",
-        "FC_RESTRI_ID": "id",
-        "FC_LABEL_FIELD": "label",
-        "FC_TYPE_RESTRI_STRICT": "1",
-        "FC_REINIT_RESTRI_STRICT_FILTER": "\"type_restriction\" = '1'",
-        "FC_KML_FIELDS_EXPORT_SOURCEAREA": {
-            "id": "QVariant.Int",
-            "label": "QVariant.String",
-            "source_buffer": "QVariant.Int"
-        },
-        "FC_KML_FIELDS_EXPORT_FEASIBLEAREA": {
-            "id": "QVariant.Int",
-            "label": "QVariant.String"
-        },
-        "FC_FILTER_VALUES": {
-            "Administration": "1",
-            "Culture": "2",
-            "Energy Infrastructure": "3",
-            "Energy Renewable": "4",
-            "Environment": "5",
-            "Hydrography": "6",
-            "Landuse": "7",
-            "Military": "8",
-            "Oil and Gas": "9",
-            "Point of Interest": "10",
-            "Risk": "11",
-            "Transportation": "12",
-            "Urban": "13"
-        },
-        "FC_CONFIG": {
-            "s": {
-                "global_area_layer": "FC Area - Solar",
-                "feasible_layer": "FC Feasible area with conditional - Solar",
-                "conditional_layer": "FC Conditional area - Solar",
-                "restriction_layer": "FC Strict restriction - Solar",
-                "restri_join_id_field": "fc_s_id",
-                "technology": "Solar"
-            },
-            "w": {
-                "global_area_layer": "FC Area - Wind",
-                "feasible_layer": "FC Feasible area with conditional - Wind",
-                "conditional_layer": "FC Conditional area - Wind",
-                "restriction_layer": "FC Strict restriction - Wind",
-                "restri_join_id_field": "fc_w_id",
-                "technology": "Wind"
-            },
-            "b": {
-                "global_area_layer": "FC Area - Bess",
-                "feasible_layer": "FC Feasible area with conditional - Bess",
-                "conditional_layer": "FC Conditional area - Bess",
-                "restriction_layer": "FC Strict restriction - Bess",
-                "restri_join_id_field": "fc_b_id",
-                "technology": "Bess"
-            },
-            "h": {
-                "global_area_layer": "FC Area - H2",
-                "feasible_layer": "FC Feasible area with conditional - H2",
-                "conditional_layer": "FC Conditional area - H2",
-                "restriction_layer": "FC Strict restriction - H2",
-                "restri_join_id_field": "fc_h_id",
-                "technology": "Hydrogen"
-            },
-            "d": {
-                "global_area_layer": "FC Area - Datacenter",
-                "feasible_layer": "FC Feasible area with conditional - Datacenter",
-                "conditional_layer": "FC Conditional area - Datacenter",
-                "restriction_layer": "FC Strict restriction - Datacenter",
-                "restri_join_id_field": "fc_d_id",
-                "technology": "Datacenter"
-            },
-            "bm": {
-                "global_area_layer": "FC Area - Biomethane",
-                "feasible_layer": "FC Feasible area with conditional - Biomethane",
-                "conditional_layer": "FC Conditional area - Biomethane",
-                "restriction_layer": "FC Strict restriction - Biomethane",
-                "restri_join_id_field": "fc_bm_id",
-                "technology": "Biomethan"
-            }
-        }
-    },
-    "DC": {
-        "DC_ANALYSE_TYPE": "DoubleCheck",
-        "DC_WORD_TITLE_TEXT": "Double Check - GIS report [Vmap]",
-        "DC_ID_FIELD": "fid",
-        "DC_RESTRI_ID": "as_id",
-        "DC_LABEL_FIELD": "name",
-        "DC_TYPE_RESTRI_STRICT": "Restriction",
-        "DC_REINIT_RESTRI_STRICT_FILTER": "\"type_restriction\" = 'Restriction'",
-        "DC_KML_FIELDS_EXPORT_SOURCEAREA": {
-            "fid": "QVariant.Int",
-            "name": "QVariant.String"
-        },
-        "DC_KML_FIELDS_EXPORT_FEASIBLEAREA": {
-            "fid": "QVariant.Int",
-            "name": "QVariant.String"
-        },
-        "DC_FILTER_VALUES": {
-            "Administration": "Administration",
-            "Culture": "Culture",
-            "Energy Infrastructure": "Energy Infrastructure",
-            "Energy Renewable": "Energy Renewable",
-            "Environment": "Environment",
-            "Hydrography": "Hydrography",
-            "Landuse": "Landuse",
-            "Military": "Military",
-            "Oil and Gas": "Oil and Gas",
-            "Point of Interest": "Point of Interest",
-            "Risk": "Risk",
-            "Transportation": "Transportation",
-            "Urban": "Urban"
-        },
-        "DC_CONFIG": {
-            "s": {
-                "global_area_layer": "DC Area - Solar",
-                "feasible_layer": "DC Feasible area - Solar",
-                "conditional_layer": "DC Conditional area - Solar",
-                "restriction_layer": "DC Strict restrictions - Solar",
-                "restri_join_id_field": "fid_dc",
-                "technology": "Solar"
-            },
-            "w": {
-                "global_area_layer": "DC Area - Wind",
-                "feasible_layer": "DC Feasible area - Wind",
-                "conditional_layer": "DC Conditional area - Wind",
-                "restriction_layer": "DC Strict restrictions - Wind",
-                "restri_join_id_field": "fid_dc",
-                "technology": "Wind"
-            },
-            "b": {
-                "global_area_layer": "DC Area - Bess",
-                "feasible_layer": "DC Feasible area - Bess",
-                "conditional_layer": "DC Conditional area - Bess",
-                "restriction_layer": "DC Strict restrictions - Bess",
-                "restri_join_id_field": "fid_dc",
-                "technology": "Bess"
-            },
-            "h": {
-                "global_area_layer": "DC Area - H2",
-                "feasible_layer": "DC Feasible area - H2",
-                "conditional_layer": "DC Conditional area - H2",
-                "restriction_layer": "DC Strict restrictions - H2",
-                "restri_join_id_field": "fid_dc",
-                "technology": "Hydrogen"
-            },
-            "d": {
-                "global_area_layer": "DC Area - Datacenter",
-                "feasible_layer": "DC Feasible area - Datacenter",
-                "conditional_layer": "DC Conditional area - Datacenter",
-                "restriction_layer": "DC Strict restrictions - Datacenter",
-                "restri_join_id_field": "fid_dc",
-                "technology": "Datacenter"
-            },
-            "bm": {
-                "global_area_layer": "DC Area - Biomethane",
-                "feasible_layer": "DC Feasible area - Biomethane",
-                "conditional_layer": "DC Conditional area - Biomethane",
-                "restriction_layer": "DC Strict restrictions - Biomethane",
-                "restri_join_id_field": "fid_dc",
-                "technology": "Biomethan"
-            }
-        }
+  "global": {
+    "PLUGIN_NAME": "Abei GIS Report Helper",
+    "FOOTER_MIDDLE_TEXT": "ENVIRONMENTAL AND URBAN PLANNING ANALYSIS",
+    "BASEMAP": "OSM Standard",
+    "THEME_DISPLAY": {
+      "1": "Administration",
+      "2": "Culture",
+      "3": "Energy Infrastructure",
+      "4": "Energy Renewable",
+      "5": "Environment",
+      "6": "Hydrography",
+      "7": "Landuse",
+      "8": "Military",
+      "9": "Oil and Gas",
+      "10": "Point of Interest",
+      "11": "Risk",
+      "12": "Transportation",
+      "13": "Urban"
     }
+  },
+  "FC": {
+    "FC_ANALYSE_TYPE": "FirstCheck",
+    "FC_WORD_TITLE_TEXT": "First Check - GIS report [Vmap]",
+    "FC_ID_FIELD": "id",
+    "FC_RESTRI_ID": "id",
+    "FC_LABEL_FIELD": "label",
+    "FC_TYPE_RESTRI_STRICT": "1",
+    "FC_REINIT_RESTRI_STRICT_FILTER": "\"type_restriction\" = '1'",
+    "FC_KML_FIELDS_EXPORT_SOURCEAREA": {
+      "id": "QVariant.Int",
+      "label": "QVariant.String",
+      "source_buffer": "QVariant.Int"
+    },
+    "FC_KML_FIELDS_EXPORT_FEASIBLEAREA": {
+      "id": "QVariant.Int",
+      "label": "QVariant.String"
+    },
+    "FC_FILTER_VALUES": {
+      "Administration": "1",
+      "Culture": "2",
+      "Energy Infrastructure": "3",
+      "Energy Renewable": "4",
+      "Environment": "5",
+      "Hydrography": "6",
+      "Landuse": "7",
+      "Military": "8",
+      "Oil and Gas": "9",
+      "Point of Interest": "10",
+      "Risk": "11",
+      "Transportation": "12",
+      "Urban": "13"
+    },
+    "FC_CONFIG": {
+      "s": {
+        "global_area_layer": "FC Area - Solar",
+        "feasible_layer": "FC Feasible area - Solar",
+        "conditional_layer": "",
+        "restriction_layer": "FC Strict restrictions - Solar",
+        "restri_join_id_field": "fc_s_id",
+        "technology": "Solar"
+      },
+      "w": {
+        "global_area_layer": "FC Area - Wind",
+        "feasible_layer": "FC Feasible area - Wind",
+        "conditional_layer": "",
+        "restriction_layer": "FC Strict restrictions - Wind",
+        "restri_join_id_field": "fc_w_id",
+        "technology": "Wind"
+      },
+      "b": {
+        "global_area_layer": "FC Area - Bess",
+        "feasible_layer": "FC Feasible area - Bess",
+        "conditional_layer": "",
+        "restriction_layer": "FC Strict restrictions - Bess",
+        "restri_join_id_field": "fc_b_id",
+        "technology": "Bess"
+      },
+      "h": {
+        "global_area_layer": "FC Area - H2",
+        "feasible_layer": "FC Feasible area - H2",
+        "conditional_layer": "",
+        "restriction_layer": "FC Strict restrictions - H2",
+        "restri_join_id_field": "fc_h_id",
+        "technology": "Hydrogen"
+      },
+      "d": {
+        "global_area_layer": "FC Area - Datacenter",
+        "feasible_layer": "FC Feasible area - Datacenter",
+        "conditional_layer": "",
+        "restriction_layer": "FC Strict restrictions - Datacenter",
+        "restri_join_id_field": "fc_d_id",
+        "technology": "Datacenter"
+      },
+      "bm": {
+        "global_area_layer": "FC Area - Biomethan",
+        "feasible_layer": "FC Feasible area - Biomethan",
+        "conditional_layer": "",
+        "restriction_layer": "FC Strict restrictions - Biomethan",
+        "restri_join_id_field": "fc_bm_id",
+        "technology": "Biomethan"
+      }
+    }
+  },
+  "DC": {
+    "DC_ANALYSE_TYPE": "DoubleCheck",
+    "DC_WORD_TITLE_TEXT": "Double Check - GIS report [Vmap]",
+    "DC_ID_FIELD": "fid",
+    "DC_RESTRI_ID": "as_id",
+    "DC_LABEL_FIELD": "Label",
+    "DC_TYPE_RESTRI_STRICT": "Restriction",
+    "DC_REINIT_RESTRI_STRICT_FILTER": "\"type_restriction\" = 'Restriction'",
+    "DC_KML_FIELDS_EXPORT_SOURCEAREA": {
+      "fid": "QVariant.Int",
+      "name": "QVariant.String"
+    },
+    "DC_KML_FIELDS_EXPORT_FEASIBLEAREA": {
+      "fid": "QVariant.Int",
+      "name": "QVariant.String"
+    },
+    "DC_FILTER_VALUES": {
+      "Administration": "Administration",
+      "Culture": "Culture",
+      "Energy Infrastructure": "Energy Infrastructure",
+      "Energy Renewable": "Energy Renewable",
+      "Environment": "Environment",
+      "Hydrography": "Hydrography",
+      "Landuse": "Landuse",
+      "Military": "Military",
+      "Oil and Gas": "Oil and Gas",
+      "Point of Interest": "Point of Interest",
+      "Risk": "Risk",
+      "Transportation": "Transportation",
+      "Urban": "Urban"
+    },
+    "DC_CONFIG": {
+      "s": {
+        "global_area_layer": "DC Area - Solar",
+        "feasible_layer": "DC Feasible area - Solar",
+        "conditional_layer": "DC Conditional area - Solar",
+        "restriction_layer": "DC Strict restrictions - Solar",
+        "restri_join_id_field": "fid_dc",
+        "technology": "Solar"
+      },
+      "w": {
+        "global_area_layer": "DC Area - Wind",
+        "feasible_layer": "DC Feasible area - Wind",
+        "conditional_layer": "DC Conditional area - Wind",
+        "restriction_layer": "DC Strict restrictions - Wind",
+        "restri_join_id_field": "fid_dc",
+        "technology": "Wind"
+      },
+      "b": {
+        "global_area_layer": "DC Area - Bess",
+        "feasible_layer": "DC Feasible area - Bess",
+        "conditional_layer": "DC Conditional area - Bess",
+        "restriction_layer": "DC Strict restrictions - Bess",
+        "restri_join_id_field": "fid_dc",
+        "technology": "Bess"
+      },
+      "h": {
+        "global_area_layer": "DC Area - H2",
+        "feasible_layer": "DC Feasible area - H2",
+        "conditional_layer": "DC Conditional area - H2",
+        "restriction_layer": "DC Strict restrictions - H2",
+        "restri_join_id_field": "fid_dc",
+        "technology": "Hydrogen"
+      },
+      "d": {
+        "global_area_layer": "DC Area - Datacenter",
+        "feasible_layer": "DC Feasible area - Datacenter",
+        "conditional_layer": "DC Conditional area - Datacenter",
+        "restriction_layer": "DC Strict restrictions - Datacenter",
+        "restri_join_id_field": "fid_dc",
+        "technology": "Datacenter"
+      },
+      "bm": {
+        "global_area_layer": "DC Area - Biomethan",
+        "feasible_layer": "DC Feasible area - Biomethan",
+        "conditional_layer": "DC Conditional area - Biomethan",
+        "restriction_layer": "DC Strict restrictions - Biomethan",
+        "restri_join_id_field": "fid_dc",
+        "technology": "Biomethan"
+      }
+    }
+  }
 }
