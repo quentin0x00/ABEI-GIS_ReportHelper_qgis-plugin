@@ -12,14 +12,24 @@ from qgis.core import (
     QgsMessageLog, Qgis, QgsSettings,
     QgsFields, QgsField, QgsFeature,
     QgsVectorLayer, QgsVectorFileWriter,
-    QgsCoordinateReferenceSystem, QgsWkbTypes, QgsApplication
+    QgsCoordinateReferenceSystem, QgsWkbTypes, QgsApplication,     QgsUnitTypes,
+    QgsLayoutItemMap,
+    QgsLayoutItemScaleBar,
+    QgsLayoutItemLegend,
+    QgsLayoutItemPicture,
+    QgsPrintLayout,
+    QgsLayoutExporter,
+    QgsLegendStyle, QgsScaleBarSettings, QgsLayoutPoint, QgsLayoutSize, QgsTextFormat, QgsRenderContext,QgsSingleSymbolRenderer, QgsCategorizedSymbolRenderer,
+    QgsExpression, QgsExpressionContextUtils, QgsExpressionContext
 )
+
+
 from qgis.PyQt.QtCore import (
     QSize, QDateTime, QTranslator,
-    QCoreApplication, QSettings, QVariant, Qt, QUrl  
+    QCoreApplication, QSettings, QVariant, Qt, QUrl ,QRectF, QPointF
 )
 from qgis.PyQt.QtGui import (
-    QIcon, QPixmap, QColor, QImage, QPainter, QFont, QCursor, QDesktopServices  
+    QIcon, QPixmap, QColor, QImage, QPainter, QFont, QCursor, QDesktopServices  , QPolygonF
 )
 from qgis.PyQt.QtWidgets import (
     QAction, QFileDialog, QMessageBox, QDialog,

@@ -123,14 +123,15 @@ class ReportGenerator:
         table.columns[2].width = Inches(2)
 
         hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = 'Labels list' if grouped else 'Label'
+        hdr_cells[0].text = 'Name'
         hdr_cells[1].text = 'Capture'
         hdr_cells[2].text = 'Notes'
 
         if grouped:
             self._add_grouped_theme_content(table, feats)
         else:
-            self._add_individual_theme_content(table, feats)
+            # self._add_individual_theme_content(table, feats)
+            pass
 
         doc.add_paragraph()
         
@@ -181,8 +182,8 @@ class ReportGenerator:
         row_cells = table.add_row().cells
 
         # Use the stored label_field
-        unique_labels = sorted(set(f[Config.get_label_field()] for f in feats))
-        row_cells[0].text = "\n".join(f"• {label}" for label in unique_labels)
+        # unique_labels = sorted(set(f[Config.get_label_field()] for f in feats))
+        # row_cells[0].text = "\n".join(f"• {label}" for label in unique_labels)
 
         theme_str = str(feats[0]['theme']).strip()
         subset = (f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' '
@@ -205,35 +206,35 @@ class ReportGenerator:
             except:
                 pass
 
-    def _add_individual_theme_content(self, table, feats):
-        """
-        Ajoute une ligne par label dans le tableau.
-        """
-        # On groupe d'abord par label
+    # def _add_individual_theme_content(self, table, feats):
+    #     """
+    #     Ajoute une ligne par label dans le tableau.
+    #     """
+    #     # On groupe d'abord par label
        
-        # On trie les labels par ordre alphabétique
-        for label in sorted(set(f[Config.get_label_field()] for f in feats)):
-            row_cells = table.add_row().cells
-            row_cells[0].text = label
+    #     # On trie les labels par ordre alphabétique
+    #     for label in sorted(set(f[Config.get_label_field()] for f in feats)):
+    #         row_cells = table.add_row().cells
+    #         row_cells[0].text = label
 
-            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
-                temp_img_path = temp_file.name
+    #         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+    #             temp_img_path = temp_file.name
 
-            subset = (f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' '
-                    f'AND \"type_restriction\" = \'{self.type_restri_strict}\' '
-                    f'AND label = \'{label.replace("'", "''")}\'')
+    #         subset = (f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' '
+    #                 f'AND \"type_restriction\" = \'{self.type_restri_strict}\' '
+    #                 f'AND label = \'{label.replace("'", "''")}\'')
             
-            try:
-                self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
-                row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(3.5))
-            except Exception as e:
-                row_cells[1].text = f"Image error: {str(e)}"
-                QgsMessageLog.logMessage(f"Error exporting image for label {label}: {str(e)}", "ABEI GIS", Qgis.Warning)
-            finally:
-                try:
-                    os.remove(temp_img_path)
-                except:
-                    pass
+    #         try:
+    #             self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
+    #             row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(3.5))
+    #         except Exception as e:
+    #             row_cells[1].text = f"Image error: {str(e)}"
+    #             QgsMessageLog.logMessage(f"Error exporting image for label {label}: {str(e)}", "ABEI GIS", Qgis.Warning)
+    #         finally:
+    #             try:
+    #                 os.remove(temp_img_path)
+    #             except:
+    #                 pass
 
     def create_word_document(self, grouped_by_theme):
         """
@@ -266,12 +267,12 @@ class ReportGenerator:
             self._add_theme_section(doc, display_name, feats, grouped=True)
     
             
-        # Section Individual
-        doc.add_heading("[GIS analysis] Strict restrictions - Individual detail", level=1)
-        for theme_value, feats in grouped_by_theme.items():
-            display_name = Config.get_display_name(theme_value)
-            # On passe grouped=False pour avoir une ligne par label
-            self._add_theme_section(doc, display_name, feats, grouped=False)
+        # # Section Individual
+        # doc.add_heading("[GIS analysis] Strict restrictions - Individual detail", level=1)
+        # for theme_value, feats in grouped_by_theme.items():
+        #     display_name = Config.get_display_name(theme_value)
+        #     # On passe grouped=False pour avoir une ligne par label
+        #     self._add_theme_section(doc, display_name, feats, grouped=False)
         
 
         doc_path = os.path.join(self.report_directory, f"[Vmap-Report]{Config.get_analyse_type()}{self.layer_manager.analysis_data['technology']}={self.layer_manager.analysis_label}.docx")
