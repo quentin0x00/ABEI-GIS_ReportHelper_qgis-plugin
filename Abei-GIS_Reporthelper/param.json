@@ -1,7 +1,7 @@
 {
   "global": {
     "PLUGIN_NAME": "Abei GIS Report Helper",
-    "FOOTER_MIDDLE_TEXT": "ENVIRONMENTAL AND URBAN PLANNING ANALYSIS",
+    "FOOTER_MIDDLE_TEXT": "PRELIMINARY CONSTRAINTS ASSESSMENT",
     "BASEMAP": "OSM Standard",
     "THEME_DISPLAY": {
       "1": "Administration",

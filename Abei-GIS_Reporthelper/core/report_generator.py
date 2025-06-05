@@ -28,162 +28,211 @@ class ReportGenerator:
 
     def _add_header(self, doc):
         """
-        Ajoute un en-tête au document Word.
-        Comprend un logo (si disponible) ou le nom "ABEI Energy".
+        Header compact avec :
+        - Logo à gauche
+        - Texte à droite
+        - Hauteur minimale (celle du logo)
+        - Centrage vertical du texte
+        - Espace après le header
         """
         section = doc.sections[0]
         header = section.header
 
-        header_table = header.add_table(1, 2, width=Inches(6.5))
-        header_table.autofit = False
+        # Réduire la distance entre le haut de la page et le header
+        section.header_distance = Inches(0.2)  # Plus compact
+        
+        # Un seul paragraphe pour tout le header
+        header_para = header.paragraphs[0]
 
-        hdr_cols = header_table.columns
-        hdr_cols[0].width = Inches(1.5)
-        hdr_cols[1].width = Inches(5.0)
+        # Logo à gauche (taille ajustée)
+        if self.logo_path and os.path.exists(self.logo_path):
+            try:
+                logo_run = header_para.add_run()
+                logo_run.add_picture(self.logo_path, width=Inches(0.8))  # Logo plus lisible
+            except:
+                header_para.add_run("LOGO").bold = True
 
-        logo_cell = header_table.cell(0, 0)
-        logo_para = logo_cell.paragraphs[0]
-        logo_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        # Texte à droite du logo (avec espaces)
+        text_run = header_para.add_run("              " + f"{Config.FOOTER_MIDDLE_TEXT} - {self.layer_manager.analysis_label}")
+        text_run.bold = True
+        text_run.font.size = Pt(10)
 
-        try:
-            if self.logo_path and os.path.exists(self.logo_path):
-                logo_run = logo_para.add_run()
-                logo_run.add_picture(self.logo_path, width=Inches(1.0))
-            else:
-                logo_para.text = "ABEI Energy"
-        except Exception as e:
-            print(f"Error loading logo: {str(e)}")
-            logo_para.text = "ABEI Energy"
-
-
+        # Alignement à gauche pour tout garder ensemble
+        header_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        
+        # Centrage vertical du texte dans le header - méthode simplifiée
+        header_para.paragraph_format.space_before = Pt(6)  # Espacement avant pour centrer
+        header_para.paragraph_format.space_after = Pt(12)  # Espace après le contenu du header
+        header_para.paragraph_format.line_spacing = 1
+        
+        # Ajouter un paragraphe vide supplémentaire dans le header pour plus d'espace
+        empty_para = header.add_paragraph()
+        empty_para.paragraph_format.space_after = Pt(6)  # Espace supplémentaire
+        
+        # Ajuster la hauteur du header pour un meilleur centrage
+        section.header_distance = Inches(0.15)
+        
     def _add_footer(self, doc):
         """
-        Ajoute un pied de page au document.
-        Contient la date actuelle, le type de rapport et le label du projet.
+        Ajoute la pagination automatique en bas à droite
         """
-        current_date = QDateTime.currentDateTime().toString("dd/MM/yyyy")
-        footer = doc.sections[0].footer
-        footer_paragraph = footer.paragraphs[0]
-        footer_paragraph.text = f"({current_date}) - {Config.FOOTER_MIDDLE_TEXT} - {self.layer_manager.analysis_label}"
-        footer_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        section = doc.sections[0]
+        footer = section.footer
+        paragraph = footer.paragraphs[0]
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        
+        # Ajout du champ de numérotation automatique
+        run = paragraph.add_run()
+        fldChar = parse_xml(r'<w:fldChar {} w:fldCharType="begin"/>'.format(nsdecls('w')))
+        run._r.append(fldChar)
+        
+        instrText = parse_xml(r'<w:instrText {} xml:space="preserve">PAGE</w:instrText>'.format(nsdecls('w')))
+        run._r.append(instrText)
+        
+        fldChar = parse_xml(r'<w:fldChar {} w:fldCharType="end"/>'.format(nsdecls('w')))
+        run._r.append(fldChar)
 
     def _add_general_info(self, doc):
         """
-        Ajoute une section avec les informations générales sur le projet :
-        nom, technologie, date, développeur, etc.
+        Ajoute une section avec les informations générales sur le projet.
         """
-        doc.add_heading('General informations', level=1)
-        info_table = doc.add_table(rows=7, cols=2)
+        # Ajouter un tableau avec 10 lignes et 3 colonnes
+        info_table = doc.add_table(rows=10, cols=3)
         info_table.style = 'Table Grid'
         info_table.autofit = False
-        info_table.columns[0].width = Inches(2.5)
-        info_table.columns[1].width = Inches(2.5)
-        rows = info_table.rows
 
+        # Set the widths of the columns
+        # Reduce the width of the first two columns and increase the width of the image column
+        # Définir les largeurs des colonnes (total = 9.5 pouces pour correspondre à la marge)
+        info_table.columns[0].width = Inches(1.5)  # Première colonne
+        info_table.columns[1].width = Inches(1.5)  # Deuxième colonne
+        info_table.columns[2].width = Inches(8)  # Colonne pour l'image
+
+        # Forcer l'application des largeurs
+        for row in info_table.rows:
+            for idx, cell in enumerate(row.cells):
+                cell.width = info_table.columns[idx].width
+
+        # Merge cells of the first row for the "SUMMARY" title
+        summary_cell = info_table.cell(0, 0).merge(info_table.cell(0, 1))
+        summary_cell.text = "SUMMARY"
+        summary_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        summary_cell.paragraphs[0].runs[0].bold = True
+
+        # Appliquer le style gris - version corrigée
+        tcPr = summary_cell._tc.get_or_add_tcPr()
+        shd = OxmlElement('w:shd')
+        shd.set(qn('w:fill'), "D9D9D9")
+        tcPr.append(shd)
+
+        # Apply a gray background to the "SUMMARY" cell
+        shading_elm = parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w')))
+
+        # Add data to the first two columns
         data = [
-            ("NAME OF PROJECT OR LANDOWNER", self.layer_manager.analysis_label),
+            ("NAME", self.layer_manager.analysis_label),
+            ("COUNTRY", "Poland"),
+            ("VOIVODESHIP (WOJEWODZTWO)", ""),
+            ("COUNTY (POWIAT)", ""),
+            ("COMMUNE (GMINA)", ""),
             ("TECHNOLOGY", self.layer_manager.analysis_data['technology']),
-            ("COUNTY", ""),
-            ("TOWNSHIP", ""),
-            ("DATE", QDateTime.currentDateTime().toString("dd/MM/yyyy")),
-            ("PROJECT DEVELOPER", ""),
-            ("ENVIRONMENTAL TECHNICIAN", (QgsProject.instance().baseName()))
+            ("DATE SENT", QDateTime.currentDateTime().toString("dd/MM/yyyy"))
         ]
 
-        for i, (label, value) in enumerate(data):
-            rows[i].cells[0].text = label
-            rows[i].cells[1].text = value
+        for i, (label, value) in enumerate(data, start=1):
+            info_table.cell(i, 0).text = label
+            info_table.cell(i, 1).text = str(value)
 
-        for row in rows:
-            for cell in row.cells:
-                for paragraph in cell.paragraphs:
-                    paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                    paragraph.paragraph_format.space_after = Pt(0)
-                    paragraph.paragraph_format.space_before = Pt(0)
+        # Add the "KEY ISSUES" row merged over the first two columns
+        key_issues_cell = info_table.cell(8, 0).merge(info_table.cell(8, 1))
+        key_issues_cell.text = "KEY ISSUES"
+        key_issues_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        key_issues_cell.paragraphs[0].runs[0].bold = True
+
+        # Apply a gray background to the "KEY ISSUES" cell
+        key_issues_cell._tc.get_or_add_tcPr().append(shading_elm)
+
+        # Merge cells of the last row for an empty cell that spans the remaining height
+        empty_cell = info_table.cell(9, 0).merge(info_table.cell(9, 1))
+        empty_cell.text = ""
+
+        # Merge cells in the image column to span the full height
+        for i in range(1, 10):
+            current_cell = info_table.cell(i, 2)
+            current_cell.merge(info_table.cell(i-1, 2))
+
+        # Add the image to the third column
+        image_cell = info_table.cell(0, 2)
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+            temp_img_path = temp_file.name
+
+        try:
+            # Export the image
+            self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, 'null')
+
+            # Add the image to the cell
+            image_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            image_cell.paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(7.0))
+        except Exception as e:
+            image_cell.text = f"Erreur : {str(e)}"
+            QgsMessageLog.logMessage(f"Erreur export image : {str(e)}", "ABEI GIS", Qgis.Warning)
+        finally:
+            try:
+                os.remove(temp_img_path)
+            except:
+                pass
+
 
     def _add_theme_section(self, doc, theme_name, feats, grouped=True):
         """
-        Ajoute une section thématique au rapport, contenant :
-
-        - Le nom du thème
-        - Une table avec labels + image(s) + commentaire(s)
-        - Données regroupées ou individuelles selon le paramètre `grouped`
-
-        :param doc: Document Word
-        :param theme_name: Nom du thème
-        :param feats: Liste des entités à afficher
-        :param grouped: Regrouper les labels ou non
+        Ajoute une section thématique au rapport dans un tableau :
+        - Ligne titre "ENVIRONMENTAL RESTRICTIONS..."
+        - Nom du thème dans la colonne "Name"
+        - Image + notes
         """
-        doc.add_heading(theme_name, level=2)
-
         table = doc.add_table(rows=1, cols=3)
         table.style = 'Table Grid'
-        table.columns[0].width = Inches(3)
-        table.columns[1].width = Inches(4)
-        table.columns[2].width = Inches(2)
+        # Ajustement des largeurs des colonnes
+        table.columns[0].width = Inches(1.1)  # 10% de la largeur totale
+        table.columns[1].width = Inches(6.6)  # 60% de la largeur totale
+        table.columns[2].width = Inches(3.3)  # 30% de la largeur totale
 
-        hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = 'Name'
-        hdr_cells[1].text = 'Capture'
-        hdr_cells[2].text = 'Notes'
+        # Ligne fusionnée pour le titre du tableau
+        title_row = table.rows[0]
+        title_cell = title_row.cells[0].merge(title_row.cells[1])
+        title_cell = title_cell.merge(title_row.cells[2])
+        title_cell.text = "ENVIRONMENTAL RESTRICTIONS"
+        title_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        title_cell.paragraphs[0].runs[0].bold = True
+        shading_elm = parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w')))
+        title_cell._tc.get_or_add_tcPr().append(shading_elm)
+
+        # En-têtes
+        hdr_cells = table.add_row().cells
+        hdr_cells[0].text = 'NAME'
+        hdr_cells[1].text = 'MAP/DESCRIPTION'
+        hdr_cells[2].text = 'COMMENTS'
+        
+        for cell in hdr_cells:
+            for paragraph in cell.paragraphs:
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         if grouped:
             self._add_grouped_theme_content(table, feats)
         else:
-            # self._add_individual_theme_content(table, feats)
-            pass
+            pass  # Cas non groupé non implémenté ici
 
         doc.add_paragraph()
         
-    def _add_global_feasible_restriction_map(self, doc):
-        """Aperçu dans un tableau sans paramètre obsolète"""
-        doc.add_heading("Analysis overview", level=2)
-        
-        # Tableau ajusté (total 5.5")
-        table = doc.add_table(rows=1, cols=2)
-        table.style = 'Table Grid'
-        table.columns[0].width = Inches(1.0)  # Colonne Notes
-        table.columns[1].width = Inches(4.5)  # Colonne Capture
-
-        # En-têtes
-        hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = 'Notes'
-        hdr_cells[1].text = 'Capture'
-
-        # Contenu
-        row_cells = table.add_row().cells
-        row_cells[0].text = ''  # Cellule vide
-
-        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
-            temp_img_path = temp_file.name
-        
-        # subset = f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' AND "type_restriction" = \'{self.type_restri_strict}\''
-        subset = 'null'
-
-        try:
-            # Appel SIMPLIFIÉ sans paramètre
-            self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
-            
-            # Image à 4.3" pour rester dans la marge
-            row_cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(4.3))
-        except Exception as e:
-            row_cells[1].text = f"Erreur : {str(e)}"
-            QgsMessageLog.logMessage(f"Erreur export image : {str(e)}", "ABEI GIS", Qgis.Warning)
-        finally:
-            try: os.remove(temp_img_path)
-            except: pass
-        doc.add_paragraph()  # Espace après le tableau
-
     def _add_grouped_theme_content(self, table, feats):
         """
         Ajoute une ligne au tableau avec tous les labels regroupés d'un thème.
         """
         row_cells = table.add_row().cells
 
-        # Use the stored label_field
-        # unique_labels = sorted(set(f[Config.get_label_field()] for f in feats))
-        # row_cells[0].text = "\n".join(f"• {label}" for label in unique_labels)
+        theme_str = str(feats[0]['theme']).strip()
+        display_name = Config.get_display_name(theme_str)
+        row_cells[0].text = display_name  # Juste le nom du thème
 
         theme_str = str(feats[0]['theme']).strip()
         subset = (f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' '
@@ -196,7 +245,7 @@ class ReportGenerator:
         self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
 
         try:
-            row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(3.5))
+            row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(7.0))
         except Exception as e:
             row_cells[1].text = f"Error loading image: {str(e)}"
             QgsMessageLog.logMessage(f"Error loading image: {str(e)}", "ABEI GIS", Qgis.Warning)
@@ -206,76 +255,43 @@ class ReportGenerator:
             except:
                 pass
 
-    # def _add_individual_theme_content(self, table, feats):
-    #     """
-    #     Ajoute une ligne par label dans le tableau.
-    #     """
-    #     # On groupe d'abord par label
-       
-    #     # On trie les labels par ordre alphabétique
-    #     for label in sorted(set(f[Config.get_label_field()] for f in feats)):
-    #         row_cells = table.add_row().cells
-    #         row_cells[0].text = label
-
-    #         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
-    #             temp_img_path = temp_file.name
-
-    #         subset = (f'"{self.restri_join_id_field}" = \'{self.layer_manager.analysis_id}\' '
-    #                 f'AND \"type_restriction\" = \'{self.type_restri_strict}\' '
-    #                 f'AND label = \'{label.replace("'", "''")}\'')
-            
-    #         try:
-    #             self.image_exporter.export_image(self.layer_manager.analysis_extent, temp_img_path, subset)
-    #             row_cells[1].paragraphs[0].add_run().add_picture(temp_img_path, width=Inches(3.5))
-    #         except Exception as e:
-    #             row_cells[1].text = f"Image error: {str(e)}"
-    #             QgsMessageLog.logMessage(f"Error exporting image for label {label}: {str(e)}", "ABEI GIS", Qgis.Warning)
-    #         finally:
-    #             try:
-    #                 os.remove(temp_img_path)
-    #             except:
-    #                 pass
-
     def create_word_document(self, grouped_by_theme):
         """
-        Crée l'intégralité du document Word à partir des données d'analyse.
-
-        - Ajoute entête et pied de page
-        - Génère les sections d’information générale
-        - Génère les sections thématiques (groupées et individuelles)
-        - Sauvegarde le fichier .docx dans le répertoire spécifié
-
-        :param grouped_by_theme: Dictionnaire de thèmes avec entités associées
-        :return: Chemin complet vers le fichier Word généré
+        Crée le document Word en orientation paysage
         """
         doc = Document()
+        
+        # Configuration de la page en paysage
+        section = doc.sections[0]
+        section.orientation = WD_ORIENTATION.LANDSCAPE
+        section.page_width = Inches(11.69)  # A4 landscape
+        section.page_height = Inches(8.27)
+        section.left_margin = Inches(0.5)
+        section.right_margin = Inches(0.5)
+        section.top_margin = Inches(0.5)
+        section.bottom_margin = Inches(0.5)
+        section.header_distance = Inches(0.3)
+        section.footer_distance = Inches(0.3)
 
         self._add_header(doc)
         self._add_footer(doc)
 
-        title = doc.add_heading(Config.FC_WORD_TITLE_TEXT, level=0)
-        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
+        # Ajout des informations générales
         self._add_general_info(doc)
-        self._add_global_feasible_restriction_map(doc)
-        doc.add_paragraph()
-
-        doc.add_heading("[GIS analysis] Strict restrictions - Grouped by theme", level=1)
-        for theme_value, feats in grouped_by_theme.items():
-            display_name = Config.get_display_name(theme_value)
-            # Ajout du nombre de restrictions dans le titre
-            self._add_theme_section(doc, display_name, feats, grouped=True)
-    
-            
-        # # Section Individual
-        # doc.add_heading("[GIS analysis] Strict restrictions - Individual detail", level=1)
-        # for theme_value, feats in grouped_by_theme.items():
-        #     display_name = Config.get_display_name(theme_value)
-        #     # On passe grouped=False pour avoir une ligne par label
-        #     self._add_theme_section(doc, display_name, feats, grouped=False)
         
+        # Saut de page après les informations générales
+        doc.add_page_break()
 
+        # Ajout des sections thématiques
+        theme_items = list(grouped_by_theme.items())
+        for index, (theme_value, feats) in enumerate(theme_items):
+            display_name = Config.get_display_name(theme_value)
+            self._add_theme_section(doc, display_name, feats, grouped=True)
+            
+            # Saut de page après chaque section thématique, SAUF pour la dernière
+            if index < len(theme_items) - 1:
+                doc.add_page_break()
+        
         doc_path = os.path.join(self.report_directory, f"[Vmap-Report]{Config.get_analyse_type()}{self.layer_manager.analysis_data['technology']}={self.layer_manager.analysis_label}.docx")
         doc.save(doc_path)
-        QgsMessageLog.logMessage(f"Word document created: {doc_path}", "[Abei GIS] Report helper", Qgis.Success)
         return doc_path

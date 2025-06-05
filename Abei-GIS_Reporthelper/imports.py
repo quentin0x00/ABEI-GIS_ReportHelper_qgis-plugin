@@ -51,9 +51,13 @@ if lib_path not in sys.path:
 from docx import Document
 from docx.shared import Inches, Cm, Pt
 from docx.shared import RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.section import WD_ORIENT
 from docx.enum.section import WD_SECTION_START
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
+from docx.enum.section import WD_ORIENTATION
