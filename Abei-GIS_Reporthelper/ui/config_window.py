@@ -52,7 +52,7 @@ class ConfigEditorDialog(QDialog):
             "&message=HELP!!😰"
         )
         teams_label = QLabel(
-            f'Contact: <a href="{teams_link_q}">Quentin (Teams)</a> | <a href="{teams_link_a}">Alexandre (Teams)</a> '
+            f'Contact: <a href="{teams_link_q}">Quentin (Teams)</a>, <a href="{teams_link_a}">Alexandre (Teams)</a> '
         )
         teams_label.setOpenExternalLinks(False)  # we'll handle it manually
         teams_label.linkActivated.connect(self._open_teams_link)
@@ -71,7 +71,7 @@ class ConfigEditorDialog(QDialog):
         load_json_layout.setContentsMargins(0, 0, 0, 0)  # Supprimer les marges
 
         # Ajouter le texte à gauche
-        load_json_label = QLabel("Load JSON:")
+        load_json_label = QLabel("Load configuration file:")
         load_json_layout.addWidget(load_json_label)
 
         # Garder votre bouton existant (inchangé)
@@ -114,37 +114,41 @@ class ConfigEditorDialog(QDialog):
         general_form.addRow("Basemap:", self.basemap_combo)
         
         self.footer_text_edit = QLineEdit()
-        general_form.addRow("Footer Text:", self.footer_text_edit)
+        general_form.addRow("Header Text:", self.footer_text_edit)
+        container.addLayout(general_form)
+        
+        self.country_text_edit = QLineEdit()
+        general_form.addRow("Country Text:", self.country_text_edit)
         general_form.addRow(QLabel(""))
         container.addLayout(general_form)
         
-        # Sous-onglets pour FC et DC (inchangé)
-        word_tabs = QTabWidget()
-        container.addWidget(word_tabs)
+        # # Sous-onglets pour FC et DC (inchangé)
+        # word_tabs = QTabWidget()
+        # container.addWidget(word_tabs)
 
-        # Onglet FC Word Report (inchangé)
-        fc_word_tab = QWidget()
-        fc_word_layout = QVBoxLayout()
-        fc_word_tab.setLayout(fc_word_layout)
-        word_tabs.addTab(fc_word_tab, "First Check")
+        # # Onglet FC Word Report (inchangé)
+        # fc_word_tab = QWidget()
+        # fc_word_layout = QVBoxLayout()
+        # fc_word_tab.setLayout(fc_word_layout)
+        # word_tabs.addTab(fc_word_tab, "First Check")
 
-        # Paramètres FC Word Report (inchangé)
-        fc_form = QFormLayout()
-        self.fc_word_title_edit = QLineEdit()
-        fc_form.addRow("Title:", self.fc_word_title_edit)
-        fc_word_layout.addLayout(fc_form)
+        # # Paramètres FC Word Report (inchangé)
+        # fc_form = QFormLayout()
+        # self.fc_word_title_edit = QLineEdit()
+        # fc_form.addRow("Title:", self.fc_word_title_edit)
+        # fc_word_layout.addLayout(fc_form)
 
-        # Onglet DC Word Report (inchangé)
-        dc_word_tab = QWidget()
-        dc_word_layout = QVBoxLayout()
-        dc_word_tab.setLayout(dc_word_layout)
-        word_tabs.addTab(dc_word_tab, "Double Check")
+        # # Onglet DC Word Report (inchangé)
+        # dc_word_tab = QWidget()
+        # dc_word_layout = QVBoxLayout()
+        # dc_word_tab.setLayout(dc_word_layout)
+        # word_tabs.addTab(dc_word_tab, "Double Check")
 
-        # Paramètres DC Word Report (inchangé)
-        dc_form = QFormLayout()
-        self.dc_word_title_edit = QLineEdit()
-        dc_form.addRow("Title:", self.dc_word_title_edit)
-        dc_word_layout.addLayout(dc_form)
+        # # Paramètres DC Word Report (inchangé)
+        # dc_form = QFormLayout()
+        # self.dc_word_title_edit = QLineEdit()
+        # dc_form.addRow("Title:", self.dc_word_title_edit)
+        # dc_word_layout.addLayout(dc_form)
         
         # Ajouter le conteneur au layout principal
         layout.addLayout(container)
@@ -346,19 +350,20 @@ class ConfigEditorDialog(QDialog):
     def _load_config_values(self):
         """Charge les valeurs actuelles dans les champs"""
         self.footer_text_edit.setText(Config.FOOTER_MIDDLE_TEXT)
+        self.country_text_edit.setText(Config.COUNTRY_TEXT)
         index = self.basemap_combo.findText(Config.BASEMAP)
         if index >= 0:
             self.basemap_combo.setCurrentIndex(index)
 
         # FC
-        self.fc_word_title_edit.setText(Config.FC_WORD_TITLE_TEXT)
+        # self.fc_word_title_edit.setText(Config.FC_WORD_TITLE_TEXT)
         self.fc_id_field_edit.setText(Config.FC_ID_FIELD)
         self.fc_restri_id_edit.setText(Config.FC_RESTRI_ID)
         self.fc_label_field_edit.setText(Config.FC_LABEL_FIELD)
         self.fc_type_restri_edit.setText(Config.FC_TYPE_RESTRI_STRICT)
 
         # DC
-        self.dc_word_title_edit.setText(Config.DC_WORD_TITLE_TEXT)
+        # self.dc_word_title_edit.setText(Config.DC_WORD_TITLE_TEXT)
         self.dc_id_field_edit.setText(Config.DC_ID_FIELD)
         self.dc_restri_id_edit.setText(Config.DC_RESTRI_ID)
         self.dc_label_field_edit.setText(Config.DC_LABEL_FIELD)
@@ -413,17 +418,18 @@ class ConfigEditorDialog(QDialog):
             # Mettre à jour les valeurs
             # Global
             config_data['global']['FOOTER_MIDDLE_TEXT'] = self.footer_text_edit.text()
+            config_data['global']['COUNTRY_TEXT'] = self.country_text_edit.text()
             config_data['global']['BASEMAP'] = self.basemap_combo.currentData() or self.basemap_combo.currentText()
             
             # FC
-            config_data['FC']['FC_WORD_TITLE_TEXT'] = self.fc_word_title_edit.text()
+            # config_data['FC']['FC_WORD_TITLE_TEXT'] = self.fc_word_title_edit.text()
             config_data['FC']['FC_ID_FIELD'] = self.fc_id_field_edit.text()
             config_data['FC']['FC_RESTRI_ID'] = self.fc_restri_id_edit.text()
             config_data['FC']['FC_LABEL_FIELD'] = self.fc_label_field_edit.text()
             config_data['FC']['FC_TYPE_RESTRI_STRICT'] = self.fc_type_restri_edit.text()
             
             # DC
-            config_data['DC']['DC_WORD_TITLE_TEXT'] = self.dc_word_title_edit.text()
+            # config_data['DC']['DC_WORD_TITLE_TEXT'] = self.dc_word_title_edit.text()
             config_data['DC']['DC_ID_FIELD'] = self.dc_id_field_edit.text()
             config_data['DC']['DC_RESTRI_ID'] = self.dc_restri_id_edit.text()
             config_data['DC']['DC_LABEL_FIELD'] = self.dc_label_field_edit.text()

@@ -131,10 +131,10 @@ class ReportGenerator:
         # Add data to the first two columns
         data = [
             ("NAME", self.layer_manager.analysis_label),
-            ("COUNTRY", "Poland"),
-            ("VOIVODESHIP (WOJEWODZTWO)", ""),
-            ("COUNTY (POWIAT)", ""),
-            ("COMMUNE (GMINA)", ""),
+            ("COUNTRY", Config.COUNTRY_TEXT),
+            ("REGION / PROVINCE", ""),  
+            ("DISTRICT / COUNTY", ""),  
+            ("MUNICIPALITY / COMMUNE", ""),
             ("TECHNOLOGY", self.layer_manager.analysis_data['technology']),
             ("DATE SENT", QDateTime.currentDateTime().toString("dd/MM/yyyy"))
         ]

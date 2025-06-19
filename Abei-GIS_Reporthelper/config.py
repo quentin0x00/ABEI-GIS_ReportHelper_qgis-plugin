@@ -40,6 +40,13 @@ class Config:
     def BASEMAP(cls):
         cls._ensure_loaded()
         return cls._config_data['global']['BASEMAP']
+    
+    @classmethod
+    @property
+    def COUNTRY_TEXT(cls):
+        cls._ensure_loaded()
+        return cls._config_data['global']['COUNTRY_TEXT']
+    
 
     @classmethod
     @property
@@ -180,6 +187,8 @@ class Config:
     def DC_CONFIG(cls):
         cls._ensure_loaded()
         return cls._config_data['DC']['DC_CONFIG']
+    
+
 
     ### === SERVICES (inchangés) ===
     @staticmethod

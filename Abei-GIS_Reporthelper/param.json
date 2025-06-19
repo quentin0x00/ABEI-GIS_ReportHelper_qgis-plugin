@@ -2,6 +2,7 @@
   "global": {
     "PLUGIN_NAME": "Abei GIS Report Helper",
     "FOOTER_MIDDLE_TEXT": "PRELIMINARY CONSTRAINTS ASSESSMENT",
+    "COUNTRY_TEXT": "Germany",
     "BASEMAP": "OSM Standard",
     "THEME_DISPLAY": {
       "1": "Administration",
@@ -55,7 +56,7 @@
       "s": {
         "global_area_layer": "FC Area - Solar",
         "feasible_layer": "FC Feasible area - Solar",
-        "conditional_layer": "",
+        "conditional_layer": "FC Conditional area - Solar",
         "restriction_layer": "FC Strict restrictions - Solar",
         "restri_join_id_field": "fc_s_id",
         "technology": "Solar"
@@ -63,7 +64,7 @@
       "w": {
         "global_area_layer": "FC Area - Wind",
         "feasible_layer": "FC Feasible area - Wind",
-        "conditional_layer": "",
+        "conditional_layer": "FC Conditional area - Wind",
         "restriction_layer": "FC Strict restrictions - Wind",
         "restri_join_id_field": "fc_w_id",
         "technology": "Wind"
@@ -71,7 +72,7 @@
       "b": {
         "global_area_layer": "FC Area - Bess",
         "feasible_layer": "FC Feasible area - Bess",
-        "conditional_layer": "",
+        "conditional_layer": "FC Conditional area - Bess",
         "restriction_layer": "FC Strict restrictions - Bess",
         "restri_join_id_field": "fc_b_id",
         "technology": "Bess"
@@ -79,7 +80,7 @@
       "h": {
         "global_area_layer": "FC Area - H2",
         "feasible_layer": "FC Feasible area - H2",
-        "conditional_layer": "",
+        "conditional_layer": "FC Conditional area - H2",
         "restriction_layer": "FC Strict restrictions - H2",
         "restri_join_id_field": "fc_h_id",
         "technology": "Hydrogen"
@@ -87,7 +88,7 @@
       "d": {
         "global_area_layer": "FC Area - Datacenter",
         "feasible_layer": "FC Feasible area - Datacenter",
-        "conditional_layer": "",
+        "conditional_layer": "FC Conditional area - Datacenter",
         "restriction_layer": "FC Strict restrictions - Datacenter",
         "restri_join_id_field": "fc_d_id",
         "technology": "Datacenter"
@@ -95,7 +96,7 @@
       "bm": {
         "global_area_layer": "FC Area - Biomethan",
         "feasible_layer": "FC Feasible area - Biomethan",
-        "conditional_layer": "",
+        "conditional_layer": "FC Conditional area - Biomethan",
         "restriction_layer": "FC Strict restrictions - Biomethan",
         "restri_join_id_field": "fc_bm_id",
         "technology": "Biomethan"
